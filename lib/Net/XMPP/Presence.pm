@@ -39,7 +39,7 @@ Net::XMPP::Presence - XMPP Presence Module
   might want this information, like if you created a Client that
   connects to two servers at once, or for writing a mini server.
 
-    use Net::XMPP qw(Client);
+    use Net::XMPP;
 
     sub presence {
       my ($sid,$Pres) = @_;
@@ -52,7 +52,7 @@ Net::XMPP::Presence - XMPP Presence Module
 
   To create a new presence to send to the server:
 
-    use Net::XMPP qw(Client);
+    use Net::XMPP;
 
     $Pres = new Net::XMPP::Presence();
 
@@ -167,12 +167,40 @@ Net::XMPP::Presence - XMPP Presence Module
                     $Pres->SetShow("away");
 
   Reply(hash) - creates a new Presence object and populates the to/from
-                fields.  If you specify a hash the same as with SetPresence
-                then those values will override the Reply values.
+                fields.  If you specify a hash the same as with
+                SetPresence then those values will override the Reply
+                values.
 
                 $Reply = $Pres->Reply();
                 $Reply = $Pres->Reply(type=>"subscribed");
 
+=head2 Removal functions
+
+  RemoveTo() -  removes the to attribute from the <presence/>.
+
+                $Pres->RemoveTo();
+  
+  RemoveFrom() -  removes the from attribute from the <presence/>.
+
+                  $Pres->RemoveFrom();
+  
+  RemoveType() -  removes the type attribute from the <presence/>.
+
+                  $Pres->RemoveType();
+  
+  RemoveStatus() -  removes the <status/> element from the <presence/>.
+
+                    $Pres->RemoveStatus();
+  
+  RemovePriority() -  removes the <priority/> element from the
+                      <presence/>.
+
+                      $Pres->RemovePriority();
+  
+  RemoveShow() -  removes the <show/> element from the <presence/>.
+
+                  $Pres->RemoveShow();
+  
 =head2 Test functions
 
   DefinedTo() - returns 1 if the to attribute is defined in the
@@ -220,7 +248,8 @@ require 5.003;
 use strict;
 use Carp;
 use vars qw( %FUNCTIONS );
-use base qw( Net::XMPP );
+use Net::XMPP::Stanza;
+use base qw( Net::XMPP::Stanza );
 
 sub new
 {
@@ -231,59 +260,45 @@ sub new
     bless($self, $proto);
 
     $self->{DEBUGHEADER} = "Presence";
-
-    $self->{DATA} = {};
-    $self->{CHILDREN} = {};
-
     $self->{TAG} = "presence";
 
-    if ("@_" ne (""))
-    {
-        if (ref($_[0]) eq "Net::XMPP::Presence")
-        {
-            return $_[0];
-        }
-        else
-        {
-            $self->{TREE} = shift;
-            $self->ParseTree();
-        }
-    }
-    else
-    {
-        $self->{TREE} = new XML::Stream::Node($self->{TAG});
-    }
+    $self->{FUNCS} = \%FUNCTIONS;
+    
+    $self->_init(@_);
 
     return $self;
 }
 
+sub _presence { my $self = shift; return new Net::XMPP::Presence(); }
 
-$FUNCTIONS{Error}->{XPath}->{Path} = 'error/text()';
 
-$FUNCTIONS{ErrorCode}->{XPath}->{Path} = 'error/@code';
+$FUNCTIONS{Error}->{path} = 'error/text()';
 
-$FUNCTIONS{From}->{XPath}->{Type} = 'jid';
-$FUNCTIONS{From}->{XPath}->{Path} = '@from';
+$FUNCTIONS{ErrorCode}->{path} = 'error/@code';
 
-$FUNCTIONS{ID}->{XPath}->{Path} = '@id';
+$FUNCTIONS{From}->{type} = 'jid';
+$FUNCTIONS{From}->{path} = '@from';
 
-$FUNCTIONS{Priority}->{XPath}->{Path} = 'priority/text()';
+$FUNCTIONS{ID}->{path} = '@id';
 
-$FUNCTIONS{Show}->{XPath}->{Path} = 'show/text()';
+$FUNCTIONS{Priority}->{path} = 'priority/text()';
 
-$FUNCTIONS{Status}->{XPath}->{Path} = 'status/text()';
+$FUNCTIONS{Show}->{path} = 'show/text()';
 
-$FUNCTIONS{To}->{XPath}->{Type} = 'jid';
-$FUNCTIONS{To}->{XPath}->{Path} = '@to';
+$FUNCTIONS{Status}->{path} = 'status/text()';
 
-$FUNCTIONS{Type}->{XPath}->{Path} = '@type';
+$FUNCTIONS{To}->{type} = 'jid';
+$FUNCTIONS{To}->{path} = '@to';
 
-$FUNCTIONS{Presence}->{XPath}->{Type}  = 'master';
+$FUNCTIONS{Type}->{path} = '@type';
 
-$FUNCTIONS{X}->{XPath}->{Type}  = 'node';
-$FUNCTIONS{X}->{XPath}->{Path}  = '*[@xmlns]';
-$FUNCTIONS{X}->{XPath}->{Child} = 'X';
-$FUNCTIONS{X}->{XPath}->{Calls} = ['Get','Defined'];
+$FUNCTIONS{XMLNS}->{path} = '@xmlns';
+
+$FUNCTIONS{Presence}->{type}  = 'master';
+
+$FUNCTIONS{Child}->{type}  = 'child';
+$FUNCTIONS{Child}->{path}  = '*[@xmlns]';
+$FUNCTIONS{Child}->{child} = {};
 
 ##############################################################################
 #
@@ -297,7 +312,7 @@ sub Reply
     my %args;
     while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
 
-    my $reply = new Net::XMPP::Presence();
+    my $reply = $self->_presence();
 
     $reply->SetID($self->GetID()) if ($self->GetID() ne "");
 

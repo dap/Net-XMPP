@@ -1,5 +1,5 @@
 
-use Net::XMPP qw(Client);
+use Net::XMPP;
 use strict;
 
 if ($#ARGV < 4)

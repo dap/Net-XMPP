@@ -1,9 +1,15 @@
 use lib "t/lib";
-use Test::More tests=>94;
+use Test::More tests=>136;
 
-BEGIN{ use_ok( "Net::XMPP","Client" ); }
+BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
+
+my $debug = new Net::XMPP::Debug(setdefault=>1,
+                                 level=>-1,
+                                 file=>"stdout",
+                                 header=>"test",
+                                );
 
 #------------------------------------------------------------------------------
 # message
@@ -25,48 +31,48 @@ testScalar($message, "Type", "Type");
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my $xoob = $message->NewX("__netxmpp__:x:test");
-ok( defined( $xoob ), "NewX - __netxmpp__:x:test" );
-isa_ok( $xoob, "Net::XMPP::X" );
+my $xoob = $message->NewChild("__netxmpptest__:child:test");
+ok( defined( $xoob ), "NewX - __netxmpptest__:child:test" );
+isa_ok( $xoob, "Net::XMPP::Stanza" );
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x = $message->GetX();
+my @x = $message->GetChild();
 is( $x[0], $xoob, "Is the first x the oob?");
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my $xroster = $message->NewX("__netxmpp__:x:test:two");
-ok( defined( $xoob ), "NewX - __netxmpp__:x:test:two" );
-isa_ok( $xoob, "Net::XMPP::X" );
+my $xroster = $message->NewChild("__netxmpptest__:child:test:two");
+ok( defined( $xoob ), "NewX - __netxmpptest__:child:test:two" );
+isa_ok( $xoob, "Net::XMPP::Stanza" );
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x2 = $message->GetX();
-is( $x2[0], $xoob, "Is the first x the oob?");
-is( $x2[1], $xroster, "Is the second x the roster?");
+my @x2 = $message->GetChild();
+is( $x2[0], $xoob, "Is the first child test?");
+is( $x2[1], $xroster, "Is the second child test two?");
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x3 = $message->GetX("__netxmpp__:x:test");
-is( $#x3, 0, "filter on xmlns - only one x... right?");
-is( $x3[0], $xoob, "Is the first x the oob?");
+my @x3 = $message->GetChild("__netxmpptest__:child:test");
+is( $#x3, 0, "filter on xmlns - only one child... right?");
+is( $x3[0], $xoob, "Is the first child the oob?");
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x4 = $message->GetX("__netxmpp__:x:test:two");
+my @x4 = $message->GetChild("__netxmpptest__:child:test:two");
 is( $#x4, 0, "filter on xmlns - only one x... right?");
 is( $x4[0], $xroster, "Is the first x the roster?");
 
-ok( $message->DefinedX(), "DefinedX - yes");
-ok( $message->DefinedX("__netxmpp__:x:test:two"), "DefinedX - __netxmpp__:x:test:two - yes");
-ok( $message->DefinedX("__netxmpp__:x:test"), "DefinedX - __netxmpp__:x:test - yes");
-ok( !$message->DefinedX("foo:bar"), "DefinedX - foo:bar - no");
+ok( $message->DefinedChild(), "DefinedChild - yes");
+ok( $message->DefinedChild("__netxmpptest__:child:test:two"), "DefinedChild - __netxmpptest__:child:test:two - yes");
+ok( $message->DefinedChild("__netxmpptest__:child:test"), "DefinedChild - __netxmpptest__:child:test - yes");
+ok( !$message->DefinedChild("foo:bar"), "DefinedChild - foo:bar - no");
 
 #------------------------------------------------------------------------------
 # message
@@ -110,4 +116,36 @@ testPostScalar($message2, "Subject", "subject");
 testPostScalar($message2, "Thread", "thread");
 testPostJID($message2, "To", "user2", "server2", "resource2");
 testPostScalar($message2, "Type", "type");
+
+is( $message2->GetXML(), "<message from='user1\@server1/resource1' id='id' to='user2\@server2/resource2' type='type'><body>body</body><error code='401'>error</error><subject>subject</subject><thread>thread</thread></message>", "Full message");
+
+#------------------------------------------------------------------------------
+# Reply
+#------------------------------------------------------------------------------
+testRemove($message2, "Type");
+
+my $reply = $message2->Reply();
+isa_ok($reply,"Net::XMPP::Message");
+
+testPostJID($reply, "From", "user2", "server2", "resource2");
+testPostScalar($reply, "ID", "id");
+testPostScalar($reply, "Subject", "re: subject");
+testPostScalar($reply, "Thread", "thread");
+testPostJID($reply, "To", "user1", "server1", "resource1");
+
+is( $reply->GetXML(), "<message from='user2\@server2/resource2' id='id' to='user1\@server1/resource1'><subject>re: subject</subject><thread>thread</thread></message>", "Reply - GetXML()" );
+
+#------------------------------------------------------------------------------
+# Remove it
+#------------------------------------------------------------------------------
+testRemove($message2, "Body");
+testRemove($message2, "ErrorCode");
+testRemove($message2, "Error");
+testRemove($message2, "From");
+testRemove($message2, "ID");
+testRemove($message2, "Subject");
+testRemove($message2, "Thread");
+testRemove($message2, "To");
+
+is( $message2->GetXML(), "<message/>", "Empty message");
 

@@ -1,21 +1,16 @@
-Net::XMPP v0.1
+Net::XMPP v1.0
 
+The Extensible Messaging and Presence Protocol (XMPP) is an IETF standard
+that provides a complete cross protocol messaging solution.  The problem
+with current IM solutions is that they are all proprietary and cannot
+talk to each other.  XMPP seeks to get rid of those barriers.
 
-DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
-DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
-DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+For more information about the Jabber project visit http://www.xmpp.org.
 
-
-This module is being used a placeholder to reserve the Net::XMPP module
-namespace while I finish up a working version and a new revision of
-Net::Jabber that uses it.
-
-Please continue using Net::Jabber until this module reaches v1.0.
-
-
-DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
-DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
-DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+Net::XMPP is a collection of Perl modules that provide a Perl Developer
+access to the XMPP protocol.  Using OOP modules we provide a clean
+interface to writing anything from a full client to a simple protocol
+tester.
 
 
 Ryan Eatmon
@@ -35,9 +30,11 @@ INSTALLATION
 
 STATUS
 
-  Very very very very alpha.  It will not work.  I promise you that.
+  Beta.  There is some more testing and features to add before I'm ready to
+call this 1.0.  It should be usable, but I would not put any production code
+using this yet.  If you run into problems, downgrade to Net::Jabber 1.29.
 
 Please send any bug reports to reatmon@jabber.org.
 
-2004/01/16
+2004/08/22
 

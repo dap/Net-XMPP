@@ -1,18 +1,17 @@
 use lib "t/lib";
-use Test::More tests=>1;
+use Test::More tests=>5;
 
-BEGIN{ use_ok( "Net::XMPP","Client" ); }
-
-exit;
+BEGIN{ use_ok( "Net::XMPP" ); }
 
 my $Client;
 my $connected = 0;
 
 my $server = "obelisk.net";
-my $port = 5222;
+my $port = 5225;
 my $username = "test-netjabber";
 my $password = "test";
 my $resource = $$.time.qx(hostname);
+chomp($resource);
 
 ###############################################################################
 #
@@ -74,7 +73,7 @@ sub onConnect
 ###############################################################################
 sub onAuth
 {
-    $Client->MessageSend(to=>$username."@".$server,
+    $Client->MessageSend(to=>$username."@".$server."/".$resource,
                          subject=>"test",
                          body=>"This is a test.");
 

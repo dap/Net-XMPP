@@ -1,9 +1,15 @@
 use lib "t/lib";
-use Test::More tests=>86;
+use Test::More tests=>115;
 
-BEGIN{ use_ok( "Net::XMPP","Client" ); }
+BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
+
+my $debug = new Net::XMPP::Debug(setdefault=>1,
+                                 level=>-1,
+                                 file=>"stdout",
+                                 header=>"test",
+                                );
 
 #------------------------------------------------------------------------------
 # iq
@@ -19,56 +25,62 @@ testScalar($iq, "ID", "id");
 testJID($iq, "To", "user2", "server2", "resource2");
 testScalar($iq, "Type", "Type");
 
-is( $iq->DefinedX("__netxmpptest__:x:test"), "", "not DefinedX - __netxmpptest__:x:test" );
-is( $iq->DefinedX("__netxmpptest__:x:test:two"), "", "not DefinedX - __netxmpptest__:x:test:two" );
+is( $iq->DefinedChild("__netxmpptest__:child:test"), "", "not DefinedChild - __netxmpptest__:child:test" );
+is( $iq->DefinedChild("__netxmpptest__:child:test:two"), "", "not DefinedChild - __netxmpptest__:child:test:two" );
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my $xoob = $iq->NewX("__netxmpptest__:x:test");
-ok( defined( $xoob ), "NewX - __netxmpptest__:x:test" );
-isa_ok( $xoob, "Net::XMPP::X" );
-is( $iq->DefinedX(), 1, "DefinedX" );
-is( $iq->DefinedX("__netxmpptest__:x:test"), 1, "DefinedX - __netxmpptest__:x:test" );
+my $xoob = $iq->NewChild("__netxmpptest__:child:test");
+ok( defined( $xoob ), "NewX - __netxmpptest__:child:test" );
+isa_ok( $xoob, "Net::XMPP::Stanza" );
+is( $iq->DefinedChild(), 1, "DefinedChild" );
+is( $iq->DefinedChild("__netxmpptest__:child:test"), 1, "DefinedChild - __netxmpptest__:child:test" );
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x = $iq->GetX();
-is( $x[0], $xoob, "Is the first x the oob?");
+my @x = $iq->GetChild();
+is( $x[0], $xoob, "Is the first child the oob?");
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my $xroster = $iq->NewX("__netxmpptest__:x:test:two");
-ok( defined( $xoob ), "NewX - __netxmpptest__:x:test:two" );
-isa_ok( $xoob, "Net::XMPP::X" );
-is( $iq->DefinedX(), 1, "DefinedX" );
-is( $iq->DefinedX("__netxmpptest__:x:test"), 1, "DefinedX - __netxmpptest__:x:test" );
-is( $iq->DefinedX("__netxmpptest__:x:test:two"), 1, "DefinedX - __netxmpptest__:x:test:two" );
+my $xroster = $iq->NewChild("__netxmpptest__:child:test:two");
+ok( defined( $xoob ), "NewChild - __netxmpptest__:child:test:two" );
+isa_ok( $xoob, "Net::XMPP::Stanza" );
+is( $iq->DefinedChild(), 1, "DefinedChild" );
+is( $iq->DefinedChild("__netxmpptest__:child:test"), 1, "DefinedChild - __netxmpptest__:child:test" );
+is( $iq->DefinedChild("__netxmpptest__:child:test:two"), 1, "DefinedChild - __netxmpptest__:child:test:two" );
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x2 = $iq->GetX();
-is( $x2[0], $xoob, "Is the first x the oob?");
-is( $x2[1], $xroster, "Is the second x the roster?");
+my @x2 = $iq->GetChild();
+is( $x2[0], $xoob, "Is the first child the oob?");
+is( $x2[1], $xroster, "Is the second child the roster?");
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x3 = $iq->GetX("__netxmpptest__:x:test");
-is( $#x3, 0, "filter on xmlns - only one x... right?");
-is( $x3[0], $xoob, "Is the first x the oob?");
+my @x3 = $iq->GetChild("__netxmpptest__:child:test");
+is( $#x3, 0, "filter on xmlns - only one child... right?");
+is( $x3[0], $xoob, "Is the first child the oob?");
 
 #------------------------------------------------------------------------------
 # X
 #------------------------------------------------------------------------------
-my @x4 = $iq->GetX("__netxmpptest__:x:test:two");
-is( $#x4, 0, "filter on xmlns - only one x... right?");
-is( $x4[0], $xroster, "Is the first x the roster?");
+my @x4 = $iq->GetChild("__netxmpptest__:child:test:two");
+is( $#x4, 0, "filter on xmlns - only one child... right?");
+is( $x4[0], $xroster, "Is the first child the roster?");
 
-is( $iq->DefinedX("__netxmpptest__:x:test:three"), "", "not DefinedX - __netxmpptest__:x:test:three" );
+is( $iq->DefinedChild("__netxmpptest__:child:test:three"), "", "not DefinedChild - __netxmpptest__:child:test:three" );
+
+#------------------------------------------------------------------------------
+# Query
+#------------------------------------------------------------------------------
+my $child = $iq->GetQuery();
+is($child, $xoob, "Is the query xoob?");
 
 #------------------------------------------------------------------------------
 # iq
@@ -97,36 +109,41 @@ $iq2->SetIQ(error=>"error",
             to=>"user2\@server2/resource2",
             type=>"type");
 
-testPostScalar($iq, "Error", "error");
-testPostScalar($iq, "ErrorCode", "401");
-testPostJID($iq, "From", "user1", "server1", "resource1");
-testPostScalar($iq, "ID", "id");
-testPostJID($iq, "To", "user2", "server2", "resource2");
-testPostScalar($iq, "Type", "Type");
+testPostScalar($iq2, "Error", "error");
+testPostScalar($iq2, "ErrorCode", "401");
+testPostJID($iq2, "From", "user1", "server1", "resource1");
+testPostScalar($iq2, "ID", "id");
+testPostJID($iq2, "To", "user2", "server2", "resource2");
+testPostScalar($iq2, "Type", "type");
 
+is( $iq2->GetXML(), "<iq from='user1\@server1/resource1' id='id' to='user2\@server2/resource2' type='type'><error code='401'>error</error></iq>", "Full iq");
 
-my $iq3 = new Net::XMPP::IQ();
-ok( defined($iq3), "new()");
-isa_ok( $iq3, "Net::XMPP::IQ");
+#------------------------------------------------------------------------------
+# Reply
+#------------------------------------------------------------------------------
+my $query = $iq2->NewChild("jabber:iq:roster");
 
-$iq3->SetIQ(error=>"error",
-            errorcode=>"401",
-            from=>"user1\@server1/resource1",
-            id=>"id",
-            to=>"user2\@server2/resource2",
-            type=>"type");
+my $reply = $iq2->Reply();
+isa_ok($reply,"Net::XMPP::IQ");
 
-my $query = $iq3->NewQuery("__netxmpptest__:query:test");
-ok( defined($query), "new()");
-isa_ok( $query, "Net::XMPP::Query");
+testPostJID($reply, "From", "user2", "server2", "resource2");
+testPostScalar($reply, "ID", "id");
+testPostJID($reply, "To", "user1", "server1", "resource1");
+testPostScalar($reply, "Type", "result");
 
-$query->SetTest(Bar=>"bar",
-                Foo=>"foo");
+is($reply->GetXML(),"<iq from='user2\@server2/resource2' id='id' to='user1\@server1/resource1' type='result'><query xmlns='jabber:iq:roster'/></iq>","Reply - GetXML()");
 
-is( $iq3->GetXML(), "<iq from='user1\@server1/resource1' id='id' to='user2\@server2/resource2' type='type'><error code='401'>error</error><test foo='foo' xmlns='__netxmpptest__:query:test'><bar>bar</bar></test></iq>", "GetXML()");
+#------------------------------------------------------------------------------
+# Remove it
+#------------------------------------------------------------------------------
+testRemove($iq2, "ErrorCode");
+testRemove($iq2, "Error");
+testRemove($iq2, "From");
+testRemove($iq2, "ID");
+testRemove($iq2, "To");
+testRemove($iq2, "Type");
 
-my $reply = $iq3->Reply();
+$iq2->RemoveChild("jabber:iq:roster");
 
-is( $reply->GetXML(), "<iq from='user2\@server2/resource2' id='id' to='user1\@server1/resource1' type='result'><test xmlns='__netxmpptest__:query:test'/></iq>", "GetXML()");
-
+is( $iq2->GetXML(), "<iq/>", "Empty iq");
 

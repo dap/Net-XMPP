@@ -1,7 +1,7 @@
 use lib "t/lib";
 use Test::More tests=>15;
 
-BEGIN{ use_ok( "Net::XMPP","Client" ); }
+BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 

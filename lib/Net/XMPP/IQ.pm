@@ -36,7 +36,7 @@ Net::XMPP::IQ - XMPP Info/Query Module
   Net::XMPP::IQ differs from the other Net::XMPP::* modules in that
   the XMLNS of the query is split out into a submodule under
   IQ.  For specifics on each module please view the documentation
-  for the Net::XMPP::Query module.
+  for the Net::XMPP::Namespaces module.
 
   A Net::XMPP::IQ object is passed to the callback function for the
   message.  Also, the first argument to the callback functions is the
@@ -44,12 +44,14 @@ Net::XMPP::IQ - XMPP Info/Query Module
   want this information, like if you created a Client that connects to
   two servers at once, or for writing a mini server.
 
-    use Net::XMPP qw(Client);
+    use Net::XMPP;
 
     sub iq {
       my ($sid,$IQ) = @_;
       .
       .
+      my $reply = $IQ->Reply();
+      my $replyQuery->GetQuery();
       .
     }
 
@@ -57,17 +59,25 @@ Net::XMPP::IQ - XMPP Info/Query Module
 
   To create a new iq to send to the server:
 
-    use Net::XMPP qw(Client);
+    use Net::XMPP;
 
     $IQ = new Net::XMPP::IQ();
-    $IQType = $IQ->NewQuery( type );
+    $IQType = $IQ->NewChild( type );
     $IQType->SetXXXXX("yyyyy");
 
-  Now you can call the creation functions for the IQ, and for the <query/>
-  on the new Query object itself.  See below for the <iq/> functions, and
-  in each query module for those functions.
+  Now you can call the creation functions for the IQ, and for the
+  <query/> on the new query object itself.  See below for the <iq/>
+  functions, and in each query module for those functions.
 
 =head1 METHODS
+
+=head2 General functions
+
+  Reply(%args) - Creates a return <iq/> with the to and from
+                 filled in correctly, and a query object already
+                 added in.  The %args that you pass are passed
+                 to SetIQ() and will overwrite the IQ settings
+                 that Reply sets.
 
 =head2 Retrieval functions
 
@@ -105,10 +115,11 @@ Net::XMPP::IQ - XMPP Info/Query Module
 
                    $errorCode = $IQ->GetErrorCode();
 
-  GetQuery() - returns a Net::XMPP::Query object that contains the data
-               in the <query/> of the <iq/>.
+  GetQuery() - returns a Net::XMPP::Stanza object that contains the data
+               in the query of the <iq/>.  Basically, it returns the
+               first child in the <iq/>.
 
-               $queryTag = $IQ->GetQuery();
+               $query = $IQ->GetQuery();
 
   GetQueryXMLNS() - returns a string with the namespace of the query
                     for this <iq/>, if one exists.
@@ -127,8 +138,7 @@ Net::XMPP::IQ - XMPP Info/Query Module
                              specific Set functions below.
 
                              $IQ->SetIQ(type=>"get",
-                                        to=>"bob\@jabber.org",
-                                        query=>"info");
+                                        to=>"bob\@jabber.org");
 
                              $IQ->SetIQ(to=>"bob\@jabber.org",
                                         errorcode=>403,
@@ -141,9 +151,9 @@ Net::XMPP::IQ - XMPP Info/Query Module
 
                   $IQ->SetTo("bob\@jabber.org");
 
-  SetFrom(string) - sets the from attribute.  You can either pass a string
-  SetFrom(JID)      or a JID object.  They must be a valid JIDs or the
-                    server will return an error message.
+  SetFrom(string) - sets the from attribute.  You can either pass a
+  SetFrom(JID)      string or a JID object.  They must be a valid JIDs
+                    or the server will return an error message.
                     (ie.  bob@jabber.org, etc...)
 
                     $IQ->SetFrom("me\@jabber.org");
@@ -165,15 +175,15 @@ Net::XMPP::IQ - XMPP Info/Query Module
 
                      $IQ->SetError("Permission Denied");
 
-  NewQuery(string) - creates a new Net::XMPP::Query object with the
-                     namespace in the string.  In order for this function
-                     to work with a custom namespace, you must define and
-                     register that namespace with the IQ module.  For more
-                     information please read the documentation for
-                     Net::XMPP::Query.
+  NewChild(string) - creates a new Net::XMPP::Stanza object with the
+                     namespace in the string.  In order for this
+                     function to work with a custom namespace, you
+                     must define and register that namespace with the
+                     IQ module.  For more information please read the
+                     documentation for Net::XMPP::Stanza.
 
-                     $queryObj = $IQ->NewQuery("jabber:iq:auth");
-                     $queryObj = $IQ->NewQuery("jabber:iq:roster");
+                     $queryObj = $IQ->NewChild("jabber:iq:auth");
+                     $queryObj = $IQ->NewChild("jabber:iq:roster");
 
   Reply(hash) - creates a new IQ object and populates the to/from
                 fields.  If you specify a hash the same as with SetIQ
@@ -182,6 +192,33 @@ Net::XMPP::IQ - XMPP Info/Query Module
                 $iqReply = $IQ->Reply();
                 $iqReply = $IQ->Reply(type=>"result");
 
+=head2 Removal functions
+
+  RemoveTo() - removes the to attribute from the <iq/>.
+
+               $IQ->RemoveTo();
+  
+  RemoveFrom() - removes the from attribute from the <iq/>.
+
+                 $IQ->RemoveFrom();
+  
+  RemoveID() - removes the id attribute from the <iq/>.
+
+               $IQ->RemoveID();
+  
+  RemoveType() - removes the type attribute from the <iq/>.
+
+                 $IQ->RemoveType();
+  
+  RemoveError() - removes the <error/> element from the <iq/>.
+
+                  $IQ->RemoveError();
+  
+  RemoveErrorCode() - removes the code attribute from the <error/>
+                      element in the <iq/>.
+
+                      $IQ->RemoveErrorCode();
+
 =head2 Test functions
 
   DefinedTo() - returns 1 if the to attribute is defined in the <iq/>, 
@@ -189,8 +226,8 @@ Net::XMPP::IQ - XMPP Info/Query Module
 
                 $test = $IQ->DefinedTo();
 
-  DefinedFrom() - returns 1 if the from attribute is defined in the <iq/>, 
-                  0 otherwise.
+  DefinedFrom() - returns 1 if the from attribute is defined in the
+                  <iq/>, 0 otherwise.
 
                   $test = $IQ->DefinedFrom();
 
@@ -199,8 +236,8 @@ Net::XMPP::IQ - XMPP Info/Query Module
 
                 $test = $IQ->DefinedID();
 
-  DefinedType() - returns 1 if the type attribute is defined in the <iq/>, 
-                  0 otherwise.
+  DefinedType() - returns 1 if the type attribute is defined in the
+                  <iq/>, 0 otherwise.
 
                   $test = $IQ->DefinedType();
 
@@ -213,6 +250,9 @@ Net::XMPP::IQ - XMPP Info/Query Module
                        <error/>, 0 otherwise.
 
                        $test = $IQ->DefinedErrorCode();
+
+  DefinedQuery() - returns 1 if there is at least one namespaced
+                   child in the object.
 
 =head1 AUTHOR
 
@@ -229,7 +269,8 @@ require 5.003;
 use strict;
 use Carp;
 use vars qw( %FUNCTIONS );
-use base qw( Net::XMPP );
+use Net::XMPP::Stanza;
+use base qw( Net::XMPP::Stanza );
 
 sub new
 {
@@ -240,70 +281,52 @@ sub new
     bless($self, $proto);
 
     $self->{DEBUGHEADER} = "IQ";
-
-    $self->{DATA} = {};
-    $self->{CHILDREN} = {};
-
     $self->{TAG} = "iq";
 
-    if ("@_" ne (""))
-    {
-        if (ref($_[0]) eq "Net::XMPP::IQ")
-        {
-            return $_[0];
-        }
-        else
-        {
-            $self->{TREE} = shift;
-            $self->ParseTree();
-        }
-    }
-    else
-    {
-        $self->{TREE} = new XML::Stream::Node($self->{TAG});
-    }
+    $self->{FUNCS} = \%FUNCTIONS;
+    
+    $self->_init(@_);
 
     return $self;
 }
 
+sub _iq { my $self = shift; return new Net::XMPP::IQ(); }
 
-$FUNCTIONS{Error}->{XPath}->{Path} = 'error/text()';
+$FUNCTIONS{Error}->{path} = 'error/text()';
 
-$FUNCTIONS{ErrorCode}->{XPath}->{Path} = 'error/@code';
+$FUNCTIONS{ErrorCode}->{path} = 'error/@code';
 
-$FUNCTIONS{From}->{XPath}->{Type} = 'jid';
-$FUNCTIONS{From}->{XPath}->{Path} = '@from';
+$FUNCTIONS{From}->{type} = 'jid';
+$FUNCTIONS{From}->{path} = '@from';
 
-$FUNCTIONS{ID}->{XPath}->{Path} = '@id';
+$FUNCTIONS{ID}->{path} = '@id';
 
-$FUNCTIONS{To}->{XPath}->{Type} = 'jid';
-$FUNCTIONS{To}->{XPath}->{Path} = '@to';
+$FUNCTIONS{To}->{type} = 'jid';
+$FUNCTIONS{To}->{path} = '@to';
 
-$FUNCTIONS{Type}->{XPath}->{Path} = '@type';
+$FUNCTIONS{Type}->{path} = '@type';
 
-$FUNCTIONS{IQ}->{XPath}->{Type}  = 'master';
+$FUNCTIONS{XMLNS}->{path} = '@xmlns';
 
-$FUNCTIONS{Query}->{XPath}->{Type}  = 'node';
-$FUNCTIONS{Query}->{XPath}->{Path}  = '*[@xmlns]';
-$FUNCTIONS{Query}->{XPath}->{Child} = 'Query';
-$FUNCTIONS{Query}->{XPath}->{Calls} = ['Get','Defined'];
+$FUNCTIONS{IQ}->{type}  = 'master';
 
-$FUNCTIONS{X}->{XPath}->{Type}  = 'node';
-$FUNCTIONS{X}->{XPath}->{Path}  = '*[@xmlns]';
-$FUNCTIONS{X}->{XPath}->{Child} = 'X';
-$FUNCTIONS{X}->{XPath}->{Calls} = ['Get','Defined'];
+$FUNCTIONS{Child}->{type}  = 'child';
+$FUNCTIONS{Child}->{path}  = '*[@xmlns]';
+$FUNCTIONS{Child}->{child} = { };
 
+$FUNCTIONS{Query}->{type}  = 'child';
+$FUNCTIONS{Query}->{path}  = '*[@xmlns][0]';
+$FUNCTIONS{Query}->{child} = { child_index=>0 };
 
 ##############################################################################
 #
-# GetQueryXMLNS - returns the xmlns of the <query/> tag
+# GetQueryXMLNS - returns the xmlns of the first child
 #
 ##############################################################################
 sub GetQueryXMLNS
 {
     my $self = shift;
-    ### XXX fix this
-    return $self->{CHILDREN}->{query}->[0]->GetXMLNS() if exists($self->{CHILDREN}->{query});
+    return $self->{CHILDREN}->[0]->GetXMLNS() if ($#{$self->{CHILDREN}} > -1);
 }
 
 
@@ -319,12 +342,12 @@ sub Reply
     my %args;
     while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
 
-    my $reply = new Net::XMPP::IQ();
+    my $reply = $self->_iq();
 
     $reply->SetID($self->GetID()) if ($self->GetID() ne "");
     $reply->SetType("result");
 
-    $reply->NewQuery($self->GetQueryXMLNS());
+    $reply->NewChild($self->GetQueryXMLNS());
 
     $reply->SetIQ((($self->GetFrom() ne "") ?
                    (to=>$self->GetFrom()) :

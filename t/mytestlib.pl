@@ -6,6 +6,7 @@ sub testDefined
 
     my $defined;
     eval "\$defined = \$obj->Defined$tag();";
+    die($@) if ($@);
     is( $defined, 1, "$ltag defined" );
 }
 
@@ -16,6 +17,7 @@ sub testNotDefined
 
     my $defined;
     eval "\$defined = \$obj->Defined$tag();";
+    die($@) if ($@);
     is( $defined, '', "$ltag not defined" );
 }
 
@@ -42,7 +44,19 @@ sub testSetScalar
     my $ltag = lc($tag);
 
     eval "\$obj->Set$tag(\$value);";
+    die($@) if ($@);
     testPostScalar(@_);
+}
+
+sub testRemove
+{
+    my ($obj, $tag) = @_;
+    my $ltag = lc($tag);
+
+    testDefined(@_);
+    eval "\$obj->Remove$tag();";
+    die($@) if ($@);
+    testNotDefined(@_);
 }
 
 sub testPostScalar
@@ -54,6 +68,7 @@ sub testPostScalar
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
+    die($@) if ($@);
     is( $get, $value, "$ltag eq '$value'" );
 }
 
@@ -76,6 +91,7 @@ sub testFlag
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
+    die($@) if ($@);
     is( $get, '', "$ltag  is not set" );
     testSetFlag(@_); 
 }
@@ -86,6 +102,7 @@ sub testSetFlag
     my $ltag = lc($tag);
 
     eval "\$obj->Set$tag();";
+    die($@) if ($@);
     testPostFlag(@_);
 }
 
@@ -98,6 +115,7 @@ sub testPostFlag
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
+    die($@) if ($@);
     is( $get, 1, "$ltag  is set" );
 }
 
@@ -128,6 +146,7 @@ sub testSetJID
     my $value = $user.'@'.$server.'/'.$resource;
 
     eval "\$obj->Set$tag(\$value);";
+    die($@) if ($@);
     testPostJID(@_);
 }
 
@@ -142,10 +161,12 @@ sub testPostJID
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
+    die($@) if ($@);
     is( $get, $value, "$ltag  eq '$value'" );
 
     my $jid;
     eval "\$jid = \$obj->Get$tag(\"jid\");";
+    die($@) if ($@);
     ok( defined($jid), "jid object defined");
     isa_ok( $jid, 'Net::XMPP::JID');
     is( $jid->GetUserID(), $user , "user eq '$user'");

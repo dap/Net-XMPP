@@ -4,3 +4,4 @@ blib
 tests
 .swp$
 CVS
+gen_docs

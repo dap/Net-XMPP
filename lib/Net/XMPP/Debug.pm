@@ -125,6 +125,8 @@ use FileHandle;
 use Carp;
 use vars qw( %HANDLES $DEFAULT $DEFAULTLEVEL $DEFAULTTIME $AUTOLOAD );
 
+$DEFAULTLEVEL = -1;
+
 sub new
 {
     my $proto = shift;

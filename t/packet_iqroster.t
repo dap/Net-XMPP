@@ -1,19 +1,25 @@
 use lib "t/lib";
 use Test::More tests=>57;
 
-BEGIN{ use_ok( "Net::XMPP","Client" ); }
+BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $query = new Net::XMPP::Query();
+my $debug = new Net::XMPP::Debug(setdefault=>1,
+                                 level=>-1,
+                                 file=>"stdout",
+                                 header=>"test",
+                                );
+
+my $query = new Net::XMPP::Stanza("query");
 ok( defined($query), "new()" );
-isa_ok( $query, "Net::XMPP::Query" );
+isa_ok( $query, "Net::XMPP::Stanza" );
 
 testScalar($query,"XMLNS","jabber:iq:roster");
 
 my $item1 = $query->AddItem();
 ok( defined($item1), "new()" );
-isa_ok( $item1, "Net::XMPP::Query" );
+isa_ok( $item1, "Net::XMPP::Stanza" );
 
 testScalar($item1,"Ask","ask");
 testScalar($item1,"Group","groupA");
@@ -36,7 +42,7 @@ my $item2 = $query->AddItem(ask=>"ask",
                             subscription=>"both"
                            ); 
 ok( defined($item2), "new()" );
-isa_ok( $item2, "Net::XMPP::Query" );
+isa_ok( $item2, "Net::XMPP::Stanza" );
 
 testPostScalar($item2,"Ask","ask");
 
@@ -56,7 +62,7 @@ my $item3 = $query->AddItem(ask=>"ask",
                             subscription=>"both"
                            );
 ok( defined($item3), "new()" );
-isa_ok( $item3, "Net::XMPP::Query" );
+isa_ok( $item3, "Net::XMPP::Stanza" );
 
 is( $query->GetXML(), "<query xmlns='jabber:iq:roster'><item ask='ask' jid='user1\@server1/resource1' name='name' subscription='from'><group>groupA</group></item><item ask='ask' jid='user2\@server2/resource2' name='name2' subscription='both'><group>group1</group><group>group2</group></item><item ask='ask' jid='user3\@server3/resource3' subscription='both'/></query>", "GetXML()" ); 
 

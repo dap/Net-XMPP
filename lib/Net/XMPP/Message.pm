@@ -39,7 +39,7 @@ Net::XMPP::Message - XMPP Message Module
   might want thisinformation, like if you created a Client that
   connects to two servers at once, or for writing a mini server.
 
-    use Net::XMPP qw(Client);
+    use Net::XMPP;
 
     sub message {
       my ($sid,$Mess) = @_;
@@ -52,7 +52,7 @@ Net::XMPP::Message - XMPP Message Module
 
   To create a new message to send to the server:
 
-    use Net::XMPP qw(Client);
+    use Net::XMPP;
 
     $Mess = new Net::XMPP::Message();
 
@@ -198,6 +198,43 @@ Net::XMPP::Message - XMPP Message Module
                 $Reply = $Mess->Reply();
                 $Reply = $Mess->Reply(type=>"chat");
 
+=head2 Removal functions
+
+  RemoveTo() - removes the to attribute from the <message/>.
+
+               $Mess->RemoveTo();
+  
+  RemoveFrom() - removes the from attribute from the <message/>.
+
+                 $Mess->RemoveFrom();
+  
+  RemoveType() - removes the type attribute from the <message/>.
+
+                 $Mess->RemoveType();
+  
+  RemoveSubject() - removes the <subject/> element from the
+                    <message/>.
+
+                    $Mess->RemoveSubject();
+
+  RemoveBody() - removes the <body/> element from the
+                 <message/>.
+                  
+                 $Mess->RemoveBody();
+
+  RemoveThread() - removes the <thread/> element from the <message/>.
+
+                   $Mess->RemoveThread();
+  
+  RemoveError() - removes the <error/> element from the <message/>.
+
+                  $Mess->RemoveError();
+  
+  RemoveErrorCode() - removes the code attribute from the <error/>
+                      element in the <message/>.
+
+                      $Mess->RemoveErrorCode();
+
 =head2 Test functions
 
   DefinedTo() - returns 1 if the to attribute is defined in the
@@ -255,71 +292,58 @@ require 5.003;
 use strict;
 use Carp;
 use vars qw( %FUNCTIONS );
-use base qw( Net::XMPP );
+use Net::XMPP::Stanza;
+use base qw( Net::XMPP::Stanza );
 
 sub new
 {
     my $proto = shift;
     my $class = ref($proto) || $proto;
-    my $self = { };
-
-    $self->{TIMESTAMP} = &Net::XMPP::GetTimeStamp("local");
+    my $self = {};
 
     bless($self, $proto);
 
     $self->{DEBUGHEADER} = "Message";
-
-    $self->{DATA} = {};
-    $self->{CHILDREN} = {};
-
     $self->{TAG} = "message";
+    $self->{TIMESTAMP} = &Net::XMPP::GetTimeStamp("local");
 
-    if ("@_" ne (""))
-    {
-        if (ref($_[0]) eq "Net::XMPP::Message")
-        {
-            return $_[0];
-        } else {
-            $self->{TREE} = shift;
-            $self->ParseTree();
-        }
-    }
-    else
-    {
-        $self->{TREE} = new XML::Stream::Node($self->{TAG});
-    }
+    $self->{FUNCS} = \%FUNCTIONS;
+
+    $self->_init(@_);
 
     return $self;
 }
 
+sub _message { my $self = shift; return new Net::XMPP::Message(); }
 
-$FUNCTIONS{Body}->{XPath}->{Path}  = 'body/text()';
 
-$FUNCTIONS{Error}->{XPath}->{Path} = 'error/text()';
+$FUNCTIONS{Body}->{path}  = 'body/text()';
 
-$FUNCTIONS{ErrorCode}->{XPath}->{Path} = 'error/@code';
+$FUNCTIONS{Error}->{path} = 'error/text()';
 
-$FUNCTIONS{From}->{XPath}->{Type} = 'jid';
-$FUNCTIONS{From}->{XPath}->{Path} = '@from';
+$FUNCTIONS{ErrorCode}->{path} = 'error/@code';
 
-$FUNCTIONS{ID}->{XPath}->{Path} = '@id';
+$FUNCTIONS{From}->{type} = 'jid';
+$FUNCTIONS{From}->{path} = '@from';
 
-$FUNCTIONS{Subject}->{XPath}->{Path} = 'subject/text()';
+$FUNCTIONS{ID}->{path} = '@id';
 
-$FUNCTIONS{Thread}->{XPath}->{Path} = 'thread/text()';
+$FUNCTIONS{Subject}->{path} = 'subject/text()';
 
-$FUNCTIONS{To}->{XPath}->{Type} = 'jid';
-$FUNCTIONS{To}->{XPath}->{Path} = '@to';
+$FUNCTIONS{Thread}->{path} = 'thread/text()';
 
-$FUNCTIONS{Type}->{XPath}->{Path} = '@type';
+$FUNCTIONS{To}->{type} = 'jid';
+$FUNCTIONS{To}->{path} = '@to';
 
-$FUNCTIONS{Message}->{XPath}->{Type}  = 'master';
+$FUNCTIONS{Type}->{path} = '@type';
 
-$FUNCTIONS{X}->{XPath}->{Type}  = 'node';
-$FUNCTIONS{X}->{XPath}->{Path}  = '*[@xmlns]';
-$FUNCTIONS{X}->{XPath}->{Child} = 'X';
-$FUNCTIONS{X}->{XPath}->{Calls} = ['Get','Defined'];
+$FUNCTIONS{XMLNS}->{path} = '@xmlns';
 
+$FUNCTIONS{Message}->{type}  = 'master';
+
+$FUNCTIONS{Child}->{type} = 'child';
+$FUNCTIONS{Child}->{path} = '*[@xmlns]';
+$FUNCTIONS{Child}->{child} = {};
 
 ##############################################################################
 #
@@ -354,7 +378,7 @@ sub Reply
     my %args;
     while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
 
-    my $reply = new Net::XMPP::Message();
+    my $reply = $self->_message();
 
     if (($self->GetType() eq "") || ($self->GetType() eq "normal"))
     {

@@ -57,8 +57,8 @@ Net::XMPP::JID - XMPP JID Module
 
     $JID = new Net::XMPP::JID();
 
-  Now you can call the creation functions below to populate the tag before
-  sending it.
+  Now you can call the creation functions below to populate the tag
+  before sending it.
 
 =head2 Retrieval functions
 
@@ -153,7 +153,7 @@ sub new
     if ("@_" ne (""))
     {
         my ($jid) = @_;
-        return $jid if (ref($jid) eq "Net::XMPP::JID");
+        return $jid if ((ref($jid) ne "") && ($jid->isa("Net::XMPP::JID")));
         $self->{JID} = $jid;
     }
     else
@@ -181,11 +181,11 @@ sub ParseJID
     my $resource;
 
     ($userid,$server,$resource) =
-        ($self->{JID} =~ /^([^\@\/'"&:<>]*)\@([A-Za-z0-9\.-]+)\/?(.*?)$/);
+        ($self->{JID} =~ /^([^\@\/'"&:<>]*)\@([A-Za-z0-9\.\-\_]+)\/?(.*?)$/);
     if (!defined($server))
     {
         ($server,$resource) =
-            ($self->{JID} =~ /^([A-Za-z0-9\.-]+)\/?(.*?)$/);
+            ($self->{JID} =~ /^([A-Za-z0-9\.\-\_]+)\/?(.*?)$/);
     }
 
     $userid = "" unless defined($userid);

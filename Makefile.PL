@@ -5,12 +5,13 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => 'Net::XMPP',
-    'PREREQ_PM' => {
-        'XML::Stream' => 1.17,
-        'Digest::SHA1' => 1.02
-    },
     'VERSION_FROM' => 'lib/Net/XMPP.pm',
+    'PREREQ_PM' => {
+        'XML::Stream' => 1.22,
+        'Digest::SHA1' => 1.02,
+    },
     'dist' => {
         'COMPRESS' => 'gzip --best'
     }
 );
+

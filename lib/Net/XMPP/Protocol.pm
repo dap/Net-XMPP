@@ -101,7 +101,7 @@ Net::XMPP::Protocol - XMPP Protocol Module
                             ...
                            );
 
-    $Con->RemovePathCallBacks("/message[@type='chat']"=>&otherMessageChatCB);
+    $Con->RemoveXPathCallBacks("/message[@type='chat']"=>&otherMessageChatCB);
 
     $error = $Con->GetErrorCode();
     $Con->SetErrorCode("Timeout limit reached");
@@ -135,21 +135,13 @@ Net::XMPP::Protocol - XMPP Protocol Module
 
 =head2 Namespace Functions
 
-    $Con->DefineNamespace(xmlns=>"foo:bar",
-                         type=>"Query",
-                         functions=>[{name=>"Foo",
-                                      get=>"foo",
-                                      set=>["scalar","foo"],
-                                      defined=>"foo",
-                                      hash=>"child-data"},
-                                     {name=>"Bar",
-                                      get=>"bar",
-                                      set=>["scalar","bar"],
-                                      defined=>"bar",
-                                      hash=>"child-data"},
-                                     {name=>"FooBar",
-                                      get=>"__netjabber__:master",
-                                      set=>["master"]}]);
+    $Con->AddNamespace(ns=>"foo:bar",
+                       tag=>"myfoo",
+                       xpath=>{Foo=>{ path=> "foo/text()" },
+                               Bar=>{ path=> "bar/text()" },
+                               FooBar=>{ type=> "master" },
+                              }
+                      );
 
 =head2 Message Functions
 
@@ -182,6 +174,8 @@ Net::XMPP::Protocol - XMPP Protocol Module
 
 =head2 Presence DB Functions
 
+    $Con->PresenceDB();
+
     $Con->PresenceDBParse(Net::XMPP::Presence);
 
     $Con->PresenceDBDelete("bob\@jabber.org");
@@ -204,7 +198,23 @@ Net::XMPP::Protocol - XMPP Protocol Module
                              password=>"bobrulez",
                              resource=>"Bob");
 
+=head2 Register Functions
+
+    %hash   = $Con->RegisterRequest();
+    %hash   = $Con->RegisterRequest(to=>"transport.jabber.org");
+    %hash   = $Con->RegisterRequest(to=>"transport.jabber.org",
+                                    timeout=>10);
+
+    @result = $Con->RegisterSend(to=>"somewhere",
+                                 username=>"newuser",
+                                 resource=>"New User",
+                                 password=>"imanewbie",
+                                 email=>"newguy@new.com",
+                                 key=>"some key");
+
 =head2 Roster Functions
+
+    $Roster = $Con->Roster();
 
     %roster = $Con->RosterParse($iq);
     %roster = $Con->RosterGet();
@@ -212,6 +222,41 @@ Net::XMPP::Protocol - XMPP Protocol Module
     $Con->RosterAdd(jid=>"bob\@jabber.org",
                     name=>"Bob");
     $Con->RosterRemove(jid=>"bob@jabber.org");
+
+=head2 Roster DB Functions
+
+    $Con->RosterDB();
+
+    $Con->RosterDBParse(Net::XMPP::IQ);
+
+    $Con->RosterDBAdd("bob\@jabber.org",
+                      name=>"Bob",
+                      groups=>["foo"]
+                     );
+    
+    $Con->RosterDBRemove("bob\@jabber.org");
+    $Con->RosterDBRemove(Net::XMPP::JID);
+
+    $Con->RosterDBClear();
+
+    if ($Con->RosterDBExists("bob\@jabber.org")) { ...
+    if ($Con->RosterDBExists(Net::XMPP::JID)) { ...
+
+    @jids = $Con->RosterDBJIDs();
+    
+    if ($Con->RosterDBGroupExists("foo")) { ...
+
+    @groups = $Con->RosterDBGroups();
+    
+    @jids = $Con->RosterDBGroupJIDs("foo");
+    
+    @jids = $Con->RosterDBNonGroupJIDs();
+    
+    %hash = $Con->RosterDBQuery("bob\@jabber.org");
+    %hash = $Con->RosterDBQuery(Net::XMPP::JID);
+
+    $value = $Con->RosterDBQuery("bob\@jabber.org","name");
+    $value = $Con->RosterDBQuery(Net::XMPP::JID,"groups");
 
 
 =head1 METHODS
@@ -266,11 +311,11 @@ Net::XMPP::Protocol - XMPP Protocol Module
                                        the list.
 
     SetPresenceCallBacks(type=>function - sets the callback functions for
-                         etc...)          the specified presence type. The
-                                          function takes types as the main
-                                          key, and lets you specify a
-                                          function for each type of packet
-                                          you can get.
+                         etc...)          the specified presence type.
+                                          The function takes types as the
+                                          main key, and lets you specify
+                                          a function for each type of
+                                          packet you can get.
                                             "available"
                                             "unavailable"
                                             "subscribe"
@@ -279,17 +324,17 @@ Net::XMPP::Protocol - XMPP Protocol Module
                                             "unsubscribed"
                                             "probe"
                                             "error"
-                                          When it gets a <presence/> packet
-                                          it checks the type='' for a defined
-                                          callback.  If there is one then it
-                                          calls the function with two
-                                          arguments:
+                                          When it gets a <presence/>
+                                          packet it checks the type=''
+                                          for a defined callback.  If
+                                          there is one then it calls the
+                                          function with two arguments:
                                             the session ID, and the
                                             Net::XMPP::Presence object.
 
-                                          If you set the function to undef,
-                                          then the callback is removed from
-                                          the list.
+                                          If you set the function to
+                                          undef, then the callback is
+                                          removed from the list.
 
                         NOTE: If you use this, which is a cleaner method,
                               then you must *NOT* specify a callback for
@@ -312,11 +357,11 @@ Net::XMPP::Protocol - XMPP Protocol Module
                                          
 
     SetMessageCallBacks(type=>function, - sets the callback functions for
-                        etc...)           the specified message type. The 
-                                          function takes types as the main
-                                          key, and lets you specify a
-                                          function for each type of packet
-                                          you can get.
+                        etc...)           the specified message type. The
+                                          function takes types as the
+                                          main key, and lets you specify
+                                          a function for each type of
+                                          packet you can get.
                                            "normal"
                                            "chat"
                                            "groupchat"
@@ -324,15 +369,15 @@ Net::XMPP::Protocol - XMPP Protocol Module
                                            "error"
                                          When it gets a <message/> packet
                                          it checks the type='' for a
-                                         defined callback. If there is one
-                                         then it calls the function with
-                                         two arguments:
+                                         defined callback. If there is
+                                         one then it calls the function
+                                         with two arguments:
                                            the session ID, and the
                                            Net::XMPP::Message object.
 
-                                         If you set the function to undef,
-                                         then the callback is removed from
-                                         the list.
+                                         If you set the function to
+                                         undef, then the callback is
+                                         removed from the list.
 
                        NOTE: If you use this, which is a cleaner method,
                              then you must *NOT* specify a callback for
@@ -364,21 +409,23 @@ Net::XMPP::Protocol - XMPP Protocol Module
                              then you must *NOT* specify a callback for
                              iq in the SetCallBacks function.
 
-    SetXPathCallBacks(xpath=>function, - registers a callback function for
-                        etc...)          each xpath specified.  If
+    SetXPathCallBacks(xpath=>function, - registers a callback function
+                        etc...)          for each xpath specified.  If
                                          Net::XMPP matches the xpath,
                                          then it calls the function with
                                          two arguments:
                                            the session ID, and the
                                            Net::XMPP::Message object.
 
-                                         Xpaths are rooted at each packet:
+                                         Xpaths are rooted at each
+                                         packet:
                                            /message[@type="chat"]
                                            /iq/*[xmlns="jabber:iq:roster"][1]
                                            ...
 
-    RemoveXPathCallBacks(xpath=>function, - unregisters a callback function
-                        etc...)             for each xpath specified.
+    RemoveXPathCallBacks(xpath=>function, - unregisters a callback
+                        etc...)             function for each xpath
+                                            specified.
 
     Process(integer) - takes the timeout period as an argument.  If no
                        timeout is listed then the function blocks until
@@ -443,14 +490,14 @@ Net::XMPP::Protocol - XMPP Protocol Module
 
 =head2 Namespace Functions
 
-    DefineNamespace(xmlns=>string,    - This function is very complex.
-                    type=>string,       It is a little too complex to
-                    functions=>array)   discuss within the confines of
-                                        this small paragraph.  Please
-                                        refer to the man page for
-                                        Net::XMPP::Namespaces for the
-                                        full documentation on this
-                                        subject.
+    AddNamespace(ns=>string,  - This function is very complex.
+                 tag=>string,   It is a little too complex to
+                 xpath=>hash)   discuss within the confines of
+                                this small paragraph.  Please
+                                refer to the man page for
+                                Net::XMPP::Namespaces for the
+                                full documentation on this
+                                subject.
 
 =head2 Message Functions
 
@@ -487,6 +534,9 @@ Net::XMPP::Protocol - XMPP Protocol Module
                            unsubscribed - response to an unsubscribe
 
 =head2 Presence DB Functions
+
+    PresenceDB() - Tell the object to initialize the callbacks to
+                   automatically populate the Presence DB.
 
     PresenceDBParse(Net::XMPP::Presence) - for every presence that you
                                              receive pass the Presence
@@ -536,7 +586,46 @@ Net::XMPP::Protocol - XMPP Protocol Module
                                  contains a little more detail about the
                                  error.
 
+=head2 IQ::Register Functions
+
+    RegisterRequest(to=>string,  - send an <iq/> request to the specified
+                    timeout=>int)  server/transport, if not specified it
+    RegisterRequest()              sends to the current active server.
+                                   The function returns a hash that
+                                   contains the required fields.   Here
+                                   is an example of the hash:
+
+                                   $hash{fields}    - The raw fields from
+                                                      the iq:register.
+                                                      To be used if there
+                                                      is no x:data in the
+                                                      packet.
+                                   $hash{instructions} - How to fill out
+                                                         the form.
+                                   $hash{form}   - The new dynamic forms.
+
+                                   In $hash{form}, the fields that are
+                                   present are the required fields the
+                                   server needs.
+
+    RegisterSend(hash) - takes the contents of the hash and passes it
+                         to the SetRegister function in the module
+                         Net::XMPP::Query jabber:iq:register namespace.
+                         This function returns an array that looks like
+                         this:
+
+                            [ type , message ]
+
+                         If type is "ok" then registration was
+                         successful, otherwise message contains a
+                         little more detail about the error.
+
 =head2 Roster Functions
+
+    Roster() - returns a Net::XMPP::Roster object.  This will automatically
+               intercept all of the roster and presence packets sent from
+               the server and give you an accurate Roster.  For more
+               information please read the man page for Net::XMPP::Roster.
 
     RosterParse(IQ object) - returns a hash that contains the roster
                              parsed into the following data structure:
@@ -576,6 +665,64 @@ Net::XMPP::Protocol - XMPP Protocol Module
                          in the Net::XMPP::Query jabber:iq:roster
                          namespace.
 
+=head2 Roster DB Functions
+
+    RosterDB() - Tell the object to initialize the callbacks to
+                 automatically populate the Roster DB.  If you do this,
+                 then make sure that you call RosterRequest() instead of
+                 RosterGet() so that the callbacks can catch it and
+                 parse it.
+
+    RosterDBParse(IQ object) - If you want to manually control the
+                               database, then you can pass in all iq
+                               packets with jabber:iq:roster queries to
+                               this function.
+
+    RosterDBAdd(jid,hash) - Add a new JID into the roster DB.  The JID
+                            is either a string, or a Net::XMPP::JID
+                            object.  The hash must be the same format as
+                            the has returned by RosterParse above, and
+                            is the actual hash, not a reference.
+    
+    RosterDBRemove(jid) - Remove a JID from the roster DB. The JID is
+                          either a string, or a Net::XMPP::JID object.
+
+    RosterDBClear() - Remove all JIDs from the roster DB.
+
+    RosterDBExists(jid) - return 1 if the JID exists in the roster DB,
+                          undef otherwise.  The JID is either a string,
+                          or a Net::XMPP::JID object.
+
+    RosterDBJIDs() - returns a list of Net::XMPP::JID objects that
+                     represents all of the JIDs in the DB.
+    
+    RosterDBGroups() - returns the complete list of roster groups in the
+                       roster.
+    
+    RosterDBGroupExists(group) - return 1 if the group is a group in the
+                                 roster DB, undef otherwise.
+
+    RosterDBGroupJIDs(group) - returns a list of Net::XMPP::JID objects
+                               that represents all of the JIDs in the
+                               specified roster group.
+    
+    RosterDBNonGroupJIDs() - returns a list of Net::XMPP::JID objects
+                             that represents all of the JIDs not in a
+                             roster group.
+
+    RosterDBQuery(jid) - returns a hash containing the data from the
+                         roster DB for the specified JID.  The JID is
+                         either a string, or a Net::XMPP::JID object.
+                         The hash format the same as in RosterParse
+                         above.
+
+    RosterDBQuery(jid,key) - returns the entry from the above hash for
+                             the given key.  The available keys are:
+                               name, ask, subsrcription and groups
+                             The JID is either a string, or a 
+                             Net::XMPP::JID object.
+
+
 =head1 AUTHOR
 
 Ryan Eatmon
@@ -587,18 +734,38 @@ it under the same terms as Perl itself.
 
 =cut
 
+use Net::XMPP::Roster;
+use Net::XMPP::PrivacyLists;
 use strict;
 use Carp;
+use vars qw( %XMLNS %NEWOBJECT $SASL_CALLBACK $TLS_CALLBACK );
 
-sub new
-{
-    my $proto = shift;
-    my $self = { };
+##############################################################################
+# Define the namespaces in an easy/constant manner.
+#-----------------------------------------------------------------------------
+# 1.0
+#-----------------------------------------------------------------------------
+$XMLNS{'xmppstreams'}   = "urn:ietf:params:xml:ns:xmpp-streams";
+$XMLNS{'xmpp-bind'}     = "urn:ietf:params:xml:ns:xmpp-bind";
+$XMLNS{'xmpp-sasl'}     = "urn:ietf:params:xml:ns:xmpp-sasl";
+$XMLNS{'xmpp-session'}  = "urn:ietf:params:xml:ns:xmpp-session";
+$XMLNS{'xmpp-tls'}      = "urn:ietf:params:xml:ns:xmpp-tls";
+##############################################################################
 
-    bless($self, $proto);
-    return $self;
-}
+##############################################################################
+# BuildObject takes a root tag and builds the correct object.  NEWOBJECT is
+# the table that maps tag to package.  Override these, or provide new ones.
+#-----------------------------------------------------------------------------
+$NEWOBJECT{'iq'}       = "Net::XMPP::IQ";
+$NEWOBJECT{'message'}  = "Net::XMPP::Message";
+$NEWOBJECT{'presence'} = "Net::XMPP::Presence";
+$NEWOBJECT{'jid'}      = "Net::XMPP::JID";
+##############################################################################
 
+sub _message  { shift; my $o; eval "\$o = new $NEWOBJECT{'message'}(\@_);"; return $o;  }
+sub _presence { shift; my $o; eval "\$o = new $NEWOBJECT{'presence'}(\@_);"; return $o; }
+sub _iq       { shift; my $o; eval "\$o = new $NEWOBJECT{'iq'}(\@_);"; return $o;       }
+sub _jid      { shift; my $o; eval "\$o = new $NEWOBJECT{'jid'}(\@_);"; return $o;      }
 
 ###############################################################################
 #+-----------------------------------------------------------------------------
@@ -689,12 +856,36 @@ sub CallBack
     $pass = 0
         if (!exists($self->{CB}->{$tag}) &&
             !exists($self->{CB}->{XPath}) &&
+            !exists($self->{CB}->{DirectXPath}) &&
             !$self->CheckID($tag,$id)
            );
 
     if ($pass)
     {
         $self->{DEBUG}->Log1("CallBack: we either want it or were waiting for it.");
+
+        if (exists($self->{CB}->{DirectXPath}))
+        {
+            $self->{DEBUG}->Log1("CallBack: check directxpath");
+
+            my $direct_pass = 0;
+
+            foreach my $xpath (keys(%{$self->{CB}->{DirectXPath}}))
+            {
+                $self->{DEBUG}->Log1("CallBack: check directxpath($xpath)");
+                if ($object->XPathCheck($xpath))
+                {
+                    foreach my $func (keys(%{$self->{CB}->{DirectXPath}->{$xpath}}))
+                    {
+                        $self->{DEBUG}->Log1("CallBack: goto directxpath($xpath) function($func)");
+                        &{$self->{CB}->{DirectXPath}->{$xpath}->{$func}}($sid,$object);
+                        $direct_pass = 1;
+                    }
+                }
+            }
+            
+            return if $direct_pass;
+        }
 
         my $NJObject;
         if (ref($object) !~ /^Net::XMPP/)
@@ -731,18 +922,23 @@ sub CallBack
             {
                 $self->{DEBUG}->Log1("CallBack: no registry entry");
 
-                foreach my $xpath (keys(%{$self->{CB}->{XPath}}))
+                if (exists($self->{CB}->{XPath}))
                 {
-                    if ($NJObject->GetTree()->XPathCheck($xpath))
+                    $self->{DEBUG}->Log1("CallBack: check xpath");
+
+                    foreach my $xpath (keys(%{$self->{CB}->{XPath}}))
                     {
-                        foreach my $func (keys(%{$self->{CB}->{XPath}->{$xpath}}))
+                        if ($NJObject->GetTree()->XPathCheck($xpath))
                         {
-                            $self->{DEBUG}->Log1("CallBack: goto xpath($xpath) function($func)");
-                            &{$self->{CB}->{XPath}->{$xpath}->{$func}}($sid,$NJObject);
+                            foreach my $func (keys(%{$self->{CB}->{XPath}->{$xpath}}))
+                            {
+                                $self->{DEBUG}->Log1("CallBack: goto xpath($xpath) function($func)");
+                                &{$self->{CB}->{XPath}->{$xpath}->{$func}}($sid,$NJObject);
+                            }
                         }
                     }
                 }
-                
+
                 if (exists($self->{CB}->{$tag}))
                 {
                     $self->{DEBUG}->Log1("CallBack: goto user function($self->{CB}->{$tag})");
@@ -770,35 +966,17 @@ sub CallBack
 sub BuildObject
 {
     my $self = shift;
-    my ($tag,$object) = @_;
+    my ($tag,$tree) = @_;
 
-    my $NJObject = -1;
-    if ($tag eq "iq")
+    my $obj = -1;
+
+    if (exists($NEWOBJECT{$tag}))
     {
-        $NJObject = new Net::XMPP::IQ($object);
-    }
-    elsif ($tag eq "presence")
-    {
-        $NJObject = new Net::XMPP::Presence($object);
-    }
-    elsif ($tag eq "message")
-    {
-        $NJObject = new Net::XMPP::Message($object);
-    }
-    elsif ($tag eq "xdb")
-    {
-        $NJObject = new Net::XMPP::XDB($object);
-    }
-    elsif ($tag eq "db:result")
-    {
-        $NJObject = new Net::XMPP::Dialback::Result($object);
-    }
-    elsif ($tag eq "db:verify")
-    {
-        $NJObject = new Net::XMPP::Dialback::Verify($object);
+        $self->{DEBUG}->Log1("BuildObject: tag($tag) package($NEWOBJECT{$tag})");
+        eval "\$obj = new $NEWOBJECT{$tag}(\$tree);";
     }
 
-    return $NJObject;
+    return $obj;
 }
 
 
@@ -940,6 +1118,50 @@ sub RemoveXPathCallBacks
     {
         $self->{DEBUG}->Log1("RemoveXPathCallBacks: xpath($xpath) func($xpaths{$xpath})");
         delete($self->{CB}->{XPath}->{$xpath}->{$xpaths{$xpath}});
+        delete($self->{CB}->{XPath}->{$xpath})
+            if (scalar(keys(%{$self->{CB}->{XPath}->{$xpath}})) == 0);
+        delete($self->{CB}->{XPath})
+            if (scalar(keys(%{$self->{CB}->{XPath}})) == 0);
+    }
+}
+
+
+###############################################################################
+#
+# SetDirectXPathCallBacks - define callbacks for packets based on XPath.
+#
+###############################################################################
+sub SetDirectXPathCallBacks
+{ 
+    my $self = shift;
+    my (%xpaths) = @_;
+
+    foreach my $xpath (keys(%xpaths))
+    {
+        $self->{DEBUG}->Log1("SetDirectXPathCallBacks: xpath($xpath) func($xpaths{$xpath})");
+        $self->{CB}->{DirectXPath}->{$xpath}->{$xpaths{$xpath}} = $xpaths{$xpath};
+    }
+}
+
+
+###############################################################################
+#
+# RemoveDirectXPathCallBacks - remove callbacks for packets based on XPath.
+#
+###############################################################################
+sub RemoveDirectXPathCallBacks
+{
+    my $self = shift;
+    my (%xpaths) = @_;
+
+    foreach my $xpath (keys(%xpaths))
+    {
+        $self->{DEBUG}->Log1("RemoveDirectXPathCallBacks: xpath($xpath) func($xpaths{$xpath})");
+        delete($self->{CB}->{DirectXPath}->{$xpath}->{$xpaths{$xpath}});
+        delete($self->{CB}->{DirectXPath}->{$xpath})
+            if (scalar(keys(%{$self->{CB}->{DirectXPath}->{$xpath}})) == 0);
+        delete($self->{CB}->{DirectXPath})
+            if (scalar(keys(%{$self->{CB}->{DirectXPath}})) == 0);
     }
 }
 
@@ -981,10 +1203,10 @@ sub SendXML
     $ignoreActivity = 0 unless defined($ignoreActivity);
 
     $self->{DEBUG}->Log1("SendXML: sent($xml)");
-    &{$self->{CB}->{send}}($self->{SESSION}->{id},$xml) if exists($self->{CB}->{send});
-    $self->{STREAM}->IgnoreActivity($self->{SESSION}->{id},$ignoreActivity);
-    $self->{STREAM}->Send($self->{SESSION}->{id},$xml);
-    $self->{STREAM}->IgnoreActivity($self->{SESSION}->{id},0);
+    &{$self->{CB}->{send}}($self->GetStreamID(),$xml) if exists($self->{CB}->{send});
+    $self->{STREAM}->IgnoreActivity($self->GetStreamID(),$ignoreActivity);
+    $self->{STREAM}->Send($self->GetStreamID(),$xml);
+    $self->{STREAM}->IgnoreActivity($self->GetStreamID(),0);
 }
 
 
@@ -1046,9 +1268,9 @@ sub UniqueID
 {
     my $self = shift;
 
-    my $id_num = $self->{LIST}->{currentID};
+    my $id_num = $self->{RCVDB}->{currentID};
 
-    $self->{LIST}->{currentID}++;
+    $self->{RCVDB}->{currentID}++;
 
     return "netjabber-$id_num";
 }
@@ -1088,7 +1310,7 @@ sub ReceivedID
     my ($id) = @_;
 
     $self->{DEBUG}->Log1("ReceivedID: id($id)");
-    return 1 if exists($self->{LIST}->{$id});
+    return 1 if exists($self->{RCVDB}->{$id});
     $self->{DEBUG}->Log1("ReceivedID: nope...");
     return 0;
 }
@@ -1106,7 +1328,7 @@ sub GetID
     my ($id) = @_;
 
     $self->{DEBUG}->Log1("GetID: id($id)");
-    return $self->{LIST}->{$id} if $self->ReceivedID($id);
+    return $self->{RCVDB}->{$id} if $self->ReceivedID($id);
     $self->{DEBUG}->Log1("GetID: haven't gotten that id yet...");
     return 0;
 }
@@ -1123,7 +1345,7 @@ sub CleanID
     my ($id) = @_;
 
     $self->{DEBUG}->Log1("CleanID: id($id)");
-    delete($self->{LIST}->{$id});
+    delete($self->{RCVDB}->{$id});
 }
 
 
@@ -1175,7 +1397,7 @@ sub GotID
     my ($id,$object) = @_;
 
     $self->{DEBUG}->Log1("GotID: id($id) xml(",$object->GetXML(),")");
-    $self->{LIST}->{$id} = $object;
+    $self->{RCVDB}->{$id} = $object;
 }
 
 
@@ -1210,7 +1432,7 @@ sub TimeoutID
     my ($id) = @_;
 
     $self->{DEBUG}->Log1("TimeoutID: id($id)");
-    $self->{LIST}->{$id} = 0;
+    $self->{RCVDB}->{$id} = 0;
 }
 
 
@@ -1225,7 +1447,7 @@ sub TimedOutID
     my $self = shift;
     my ($id) = @_;
 
-    return (exists($self->{LIST}->{$id}) && ($self->{LIST}->{$id} == 0));
+    return (exists($self->{RCVDB}->{$id}) && ($self->{RCVDB}->{$id} == 0));
 }
 
 
@@ -1263,92 +1485,13 @@ sub DeregisterID
 
 ###############################################################################
 #
-# DefineNamespace - adds the namespace and corresponding functions onto the
-#                   of available functions based on namespace.
+# AddNamespace - Add a custom namespace into the mix.
 #
 ###############################################################################
-sub DefineNamespace
+sub AddNamespace
 {
     my $self = shift;
-    my %args;
-    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
-
-    croak("You must specify xmlns=>'' for the function call to DefineNamespace")
-        if !exists($args{xmlns});
-    croak("You must specify type=>'' for the function call to DefineNamespace")
-        if !exists($args{type});
-    croak("You must specify functions=>'' for the function call to DefineNamespace")
-        if !exists($args{functions});
-    
-    eval("delete(\$Net::XMPP::$args{type}::NAMESPACES{\$args{xmlns}}) if exists(\$Net::XMPP::$args{type}::NAMESPACES{\$args{xmlns}})");
-    
-    foreach my $function (@{$args{functions}})
-    {
-        my %tempHash = %{$function};
-        my %funcHash;
-        foreach my $func (keys(%tempHash))
-        {
-            $funcHash{ucfirst(lc($func))} = $tempHash{$func};
-        }
-
-        croak("You must specify name=>'' for each function in call to DefineNamespace")
-            if !exists($funcHash{Name});
-
-        my $name = delete($funcHash{Name});
-
-        if (!exists($funcHash{Set}) && exists($funcHash{Get}))
-        {
-            croak("The DefineNamespace arugments have changed, and I cannot determine the\nnew values automatically for name($name).  Please read the man page\nfor Net::XMPP::Namespaces.  I apologize for this incompatability.\n");
-        }
-
-        if (exists($funcHash{Type}) || exists($funcHash{Path}) ||
-            exists($funcHash{Child}) || exists($funcHash{Calls}))
-        {
-            foreach my $type (keys(%funcHash))
-            {
-                eval("\$Net::XMPP::$args{type}::NAMESPACES{'$args{xmlns}'}->{'$name'}->{XPath}->{'$type'} = \$funcHash{'$type'};");
-            }
-            next;
-        }
-        
-        my $type = $funcHash{Set}->[0];
-        my $xpath = $funcHash{Set}->[1];
-        if (exists($funcHash{Hash}))
-        {
-            $xpath = "text()" if ($funcHash{Hash} eq "data");
-            $xpath .= "/text()" if ($funcHash{Hash} eq "child-data");
-            $xpath = "\@$xpath" if ($funcHash{Hash} eq "att");
-            $xpath = "$1/\@$2" if ($funcHash{Hash} =~ /^att-(\S+)-(.+)$/);
-        }
-
-        if ($type eq "master")
-        {
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{\$args{xmlns}}->{\$name}->{XPath}->{Type} = 'master';");
-            next;
-        }
-        
-        if ($type eq "scalar")
-        {
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{\$args{xmlns}}->{\$name}->{XPath}->{Path} = '$xpath';");
-            next;
-        }
-        
-        if ($type eq "flag")
-        {
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{\$args{xmlns}}->{\$name}->{XPath}->{Type} = 'flag';");
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{\$args{xmlns}}->{\$name}->{XPath}->{Path} = '$xpath';");
-            next;
-        }
-
-        if (($funcHash{Hash} eq "child-add") && exists($funcHash{Add}))
-        {
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{'$args{xmlns}'}->{'$name'}->{XPath}->{Type}  = 'node';");
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{'$args{xmlns}'}->{'$name'}->{XPath}->{Path}  = \$funcHash{Add}->[3];");
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{'$args{xmlns}'}->{'$name'}->{XPath}->{Child} = [\$funcHash{Add}->[0],\$funcHash{Add}->[1]];");
-            eval("\$Net::XMPP::$args{type}::NAMESPACES{'$args{xmlns}'}->{'$name'}->{XPath}->{Calls} = ['Add'];");
-            next;
-        }
-    }
+    &Net::XMPP::Namespaces::add_ns(@_);
 }
 
 
@@ -1362,9 +1505,22 @@ sub MessageSend
 {
     my $self = shift;
 
-    my $mess = new Net::XMPP::Message();
+    my $mess = $self->_message();
     $mess->SetMessage(@_);
     $self->Send($mess);
+}
+
+
+##############################################################################
+#
+# PresenceDB - initialize the module to use the presence database
+#
+##############################################################################
+sub PresenceDB
+{
+    my $self = shift;
+
+    $self->SetXPathCallBacks('/presence'=>sub{ shift; $self->PresenceDBParse(@_) });
 }
 
 
@@ -1380,6 +1536,8 @@ sub PresenceDBParse
     my $self = shift;
     my ($presence) = @_;
 
+    $self->{DEBUG}->Log4("PresenceDBParse: pres(",$presence->GetXML(),")");
+    
     my $type = $presence->GetType();
     $type = "" unless defined($type);
     return $presence unless (($type eq "") ||
@@ -1453,7 +1611,7 @@ sub PresenceDBDelete
     my ($jid) = @_;
 
     my $indexJID = $jid;
-    $indexJID = $jid->GetJID() if (ref($jid) eq "Net::XMPP::JID");
+    $indexJID = $jid->GetJID() if $jid->isa("Net::XMPP::JID");
 
     return if !exists($self->{PRESENCEDB}->{$indexJID});
     delete($self->{PRESENCEDB}->{$indexJID});
@@ -1473,8 +1631,8 @@ sub PresenceDBClear
     $self->{DEBUG}->Log1("PresenceDBClear: clearing the database");
     foreach my $indexJID (keys(%{$self->{PRESENCEDB}}))
     {
-        delete($self->{PRESENCEDB}->{$indexJID});
         $self->{DEBUG}->Log3("PresenceDBClear: deleting ",$indexJID," from the DB");
+        delete($self->{PRESENCEDB}->{$indexJID});
     }
     $self->{DEBUG}->Log3("PresenceDBClear: database is empty");
 }
@@ -1492,7 +1650,7 @@ sub PresenceDBQuery
     my ($jid) = @_;
 
     my $indexJID = $jid;
-    $indexJID = $jid->GetJID() if (ref($jid) eq "Net::XMPP::JID");
+    $indexJID = $jid->GetJID() if $jid->isa("Net::XMPP::JID");
 
     return if !exists($self->{PRESENCEDB}->{$indexJID});
     return if (scalar(keys(%{$self->{PRESENCEDB}->{$indexJID}->{priorities}})) == 0);
@@ -1516,7 +1674,7 @@ sub PresenceDBResources
     my ($jid) = @_;
 
     my $indexJID = $jid;
-    $indexJID = $jid->GetJID() if (ref($jid) eq "Net::XMPP::JID");
+    $indexJID = $jid->GetJID() if $jid->isa("Net::XMPP::JID");
 
     my @resources;
 
@@ -1548,13 +1706,7 @@ sub PresenceSend
     $args{ignoreactivity} = 0 unless exists($args{ignoreactivity});
     my $ignoreActivity = delete($args{ignoreactivity});
 
-    my $presence = new Net::XMPP::Presence();
-
-    if (exists($args{signature}))
-    {
-        my $xSigned = $presence->NewX("jabber:x:signed");
-        $xSigned->SetSigned(signature=>delete($args{signature}));
-    }
+    my $presence = $self->_presence();
 
     $presence->SetPresence(%args);
     $self->Send($presence,$ignoreActivity);
@@ -1574,7 +1726,7 @@ sub PresenceProbe
     while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
     delete($args{type});
 
-    my $presence = new Net::XMPP::Presence();
+    my $presence = $self->_presence();
     $presence->SetPresence(type=>"probe",
                            %args);
     $self->Send($presence);
@@ -1591,7 +1743,7 @@ sub Subscription
 {
     my $self = shift;
 
-    my $presence = new Net::XMPP::Presence();
+    my $presence = $self->_presence();
     $presence->SetPresence(@_);
     $self->Send($presence);
 }
@@ -1614,7 +1766,31 @@ sub AuthSend
         unless exists($args{username});
     carp("AuthSend requires a password arguement")
         unless exists($args{password});
-    carp("AuthSend requires a resource arguement")
+
+    if($self->{STREAM}->GetStreamFeature($self->GetStreamID(),"xmpp-sasl"))
+    {
+        return $self->AuthSASL(%args);
+    }
+
+    return $self->AuthIQAuth(%args);
+}
+
+
+###############################################################################
+#
+# AuthIQAuth - Try and auth using jabber:iq:auth, the old Jabber way of
+#              authenticating.
+#
+###############################################################################
+sub AuthIQAuth
+{
+    my $self = shift;
+    my %args;
+    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+
+    $self->{DEBUG}->Log1("AuthIQAuth: old school auth");
+
+    carp("AuthIQAuth requires a resource arguement")
         unless exists($args{resource});
 
     my $authType = "digest";
@@ -1625,30 +1801,32 @@ sub AuthSend
     # First let's ask the sever what all is available in terms of auth types.
     # If we get an error, then all we can do is digest or plain.
     #--------------------------------------------------------------------------
-    my $iqAuthProbe = new Net::XMPP::IQ();
-    $iqAuthProbe->SetIQ(type=>"get");
-    my $iqAuthProbeQuery = $iqAuthProbe->NewQuery("jabber:iq:auth");
-    $iqAuthProbeQuery->SetUsername($args{username});
-    $iqAuthProbe = $self->SendAndReceiveWithID($iqAuthProbe);
+    my $iqAuth = $self->_iq();
+    $iqAuth->SetIQ(type=>"get");
+    my $iqAuthQuery = $iqAuth->NewChild("jabber:iq:auth");
+    $iqAuthQuery->SetUsername($args{username});
+    $iqAuth = $self->SendAndReceiveWithID($iqAuth);
 
-    return unless defined($iqAuthProbe);
-    return ( $iqAuthProbe->GetErrorCode() , $iqAuthProbe->GetError() )
-        if ($iqAuthProbe->GetType() eq "error");
+    return unless defined($iqAuth);
+    return ( $iqAuth->GetErrorCode() , $iqAuth->GetError() )
+        if ($iqAuth->GetType() eq "error");
 
-    if ($iqAuthProbe->GetType() eq "error")
+    if ($iqAuth->GetType() eq "error")
     {
         $authType = "digest";
     }
     else
     {
-        $iqAuthProbeQuery = $iqAuthProbe->GetQuery();
-        $authType = "plain" if $iqAuthProbeQuery->DefinedPassword();
-        $authType = "digest" if $iqAuthProbeQuery->DefinedDigest();
-        $authType = "zerok" if ($iqAuthProbeQuery->DefinedSequence() &&
-                    $iqAuthProbeQuery->DefinedToken());
-        $token = $iqAuthProbeQuery->GetToken() if ($authType eq "zerok");
-        $sequence = $iqAuthProbeQuery->GetSequence() if ($authType eq "zerok");
+        $iqAuthQuery = $iqAuth->GetChild();
+        $authType = "plain" if $iqAuthQuery->DefinedPassword();
+        $authType = "digest" if $iqAuthQuery->DefinedDigest();
+        $authType = "zerok" if ($iqAuthQuery->DefinedSequence() &&
+                    $iqAuthQuery->DefinedToken());
+        $token = $iqAuthQuery->GetToken() if ($authType eq "zerok");
+        $sequence = $iqAuthQuery->GetSequence() if ($authType eq "zerok");
     }
+
+    $self->{DEBUG}->Log1("AuthIQAuth: authType($authType)");
 
     delete($args{digest});
     delete($args{type});
@@ -1685,16 +1863,16 @@ sub AuthSend
     if ($authType eq "digest")
     {
         my $password = delete($args{password});
-        $args{digest} = Digest::SHA1::sha1_hex($self->{SESSION}->{id}.$password);
+        $args{digest} = Digest::SHA1::sha1_hex($self->GetStreamID().$password);
     }
 
     #--------------------------------------------------------------------------
     # Create a Net::XMPP::IQ object to send to the server
     #--------------------------------------------------------------------------
-    my $iqLogin = new Net::XMPP::IQ();
+    my $iqLogin = $self->_iq();
     $iqLogin->SetIQ(type=>"set");
-    my $iqAuth = $iqLogin->NewQuery("jabber:iq:auth");
-    $iqAuth->SetAuth(%args);
+    my $iqLoginQuery = $iqLogin->NewChild("jabber:iq:auth");
+    $iqLoginQuery->SetAuth(%args);
 
     #--------------------------------------------------------------------------
     # Send the IQ with the next available ID and wait for a reply with that
@@ -1709,25 +1887,373 @@ sub AuthSend
     return unless defined($iqLogin);
     return ( $iqLogin->GetErrorCode() , $iqLogin->GetError() )
         if ($iqLogin->GetType() eq "error");
+
+    $self->{DEBUG}->Log1("AuthIQAuth: we authed!");
+
     return ("ok","");
 }
 
 
 ###############################################################################
 #
+# AuthSASL - Try and auth using SASL, the XMPP preferred way of authenticating.
+#
+###############################################################################
+sub AuthSASL
+{
+    my $self = shift;
+    my %args;
+    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+
+    $self->{DEBUG}->Log1("AuthSASL: shiney new auth");
+
+    carp("AuthSASL requires a username arguement")
+        unless exists($args{username});
+    carp("AuthSASL requires a password arguement")
+        unless exists($args{password});
+
+    $args{resource} = "" unless exists($args{resource});
+
+    #-------------------------------------------------------------------------
+    # Create the SASLClient on our end
+    #-------------------------------------------------------------------------
+    my $sid = $self->{SESSION}->{id};
+    my $status =
+        $self->{STREAM}->SASLClient($sid,
+                                    $args{username},
+                                    $args{password}
+                                   );
+
+    $args{timeout} = "120" unless exists($args{timeout});
+
+    #-------------------------------------------------------------------------
+    # While we haven't timed out, keep waiting for the SASLClient to finish
+    #-------------------------------------------------------------------------
+    my $endTime = time + $args{timeout};
+    while(!$self->{STREAM}->SASLClientDone($sid) && ($endTime >= time))
+    {
+        $self->{DEBUG}->Log1("AuthSASL: haven't authed yet... let's wait.");
+        return unless (defined($self->Process(1)));
+        &{$self->{CB}->{update}}() if exists($self->{CB}->{update});
+    }
+    
+    #-------------------------------------------------------------------------
+    # The loop finished... but was it done?
+    #-------------------------------------------------------------------------
+    if (!$self->{STREAM}->SASLClientDone($sid))
+    {
+        $self->{DEBUG}->Log1("AuthSASL: timed out...");
+        return( "system","SASL timed out authenticating");
+    }
+    
+    #-------------------------------------------------------------------------
+    # Ok, it was done... but did we auth?
+    #-------------------------------------------------------------------------
+    if (!$self->{STREAM}->SASLClientAuthed($sid))
+    {
+        $self->{DEBUG}->Log1("AuthSASL: Authentication failed.");
+        return ( "error", $self->{STREAM}->SASLClientError($sid));
+    }
+    
+    #-------------------------------------------------------------------------
+    # Phew... Restart the <stream:stream> per XMPP
+    #-------------------------------------------------------------------------
+    $self->{DEBUG}->Log1("AuthSASL: We authed!");
+    $self->{SESSION} = $self->{STREAM}->OpenStream($sid);
+    $sid = $self->{SESSION}->{id};
+    
+    $self->{DEBUG}->Log1("AuthSASL: We got a new session. sid($sid)");
+
+    #-------------------------------------------------------------------------
+    # Look in the new set of <stream:feature/>s and see if xmpp-bind was
+    # offered.
+    #-------------------------------------------------------------------------
+    my $bind = $self->{STREAM}->GetStreamFeature($sid,"xmpp-bind");
+    if ($bind)
+    {
+        $self->{DEBUG}->Log1("AuthSASL: Binding to resource");
+        $self->BindResource($args{resource});
+    }
+
+    #-------------------------------------------------------------------------
+    # Look in the new set of <stream:feature/>s and see if xmpp-session was
+    # offered.
+    #-------------------------------------------------------------------------
+    my $session = $self->{STREAM}->GetStreamFeature($sid,"xmpp-session");
+    if ($session)
+    {
+        $self->{DEBUG}->Log1("AuthSASL: Starting session");
+        $self->StartSession();
+    }
+
+    return ("ok","");
+}
+
+
+##############################################################################
+#
+# BindResource - bind to a resource
+#
+##############################################################################
+sub BindResource
+{
+    my $self = shift;
+    my $resource = shift;
+
+    $self->{DEBUG}->Log2("BindResource: Binding to resource");
+    my $iq = $self->_iq();
+
+    $iq->SetIQ(type=>"set");
+    my $bind = $iq->NewChild(&ConstXMLNS("xmpp-bind"));
+    
+    if (defined($resource) && ($resource ne ""))
+    {
+        $self->{DEBUG}->Log2("BindResource: resource($resource)");
+        $bind->SetBind(resource=>$resource);
+    }
+
+    my $result = $self->SendAndReceiveWithID($iq);
+}
+
+
+##############################################################################
+#
+# StartSession - Initialize a session
+#
+##############################################################################
+sub StartSession
+{
+    my $self = shift;
+
+    my $iq = $self->_iq();
+
+    $iq->SetIQ(type=>"set");
+    my $session = $iq->NewChild(&ConstXMLNS("xmpp-session"));
+    
+    my $result = $self->SendAndReceiveWithID($iq);
+}
+
+
+##############################################################################
+#
+# PrivacyLists - Initialize a Net::XMPP::PrivacyLists object and return it.
+#
+##############################################################################
+sub PrivacyLists
+{
+    my $self = shift;
+
+    return new Net::XMPP::PrivacyLists(connection=>$self);
+}
+
+
+##############################################################################
+#
+# PrivacyListsGet - Sends an empty IQ to the server to request that the user's
+#                   Privacy Lists be sent to them.  Returns the iq packet
+#                   of the result.
+#
+##############################################################################
+sub PrivacyListsGet
+{
+    my $self = shift;
+    my %args;
+    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+
+    my $iq = $self->_iq();
+    $iq->SetIQ(type=>"get");
+    my $query = $iq->NewChild("jabber:iq:privacy");
+
+    if (exists($args{list}))
+    {
+        $query->AddList(name=>$args{list});
+    }
+
+    $iq = $self->SendAndReceiveWithID($iq);
+    return unless defined($iq);
+
+    return $iq;
+}
+
+
+##############################################################################
+#
+# PrivacyListsRequest - Sends an empty IQ to the server to request that the
+#                       user's privacy lists be sent to them, and return to
+#                       let the user's program handle parsing the return packet.
+#
+##############################################################################
+sub PrivacyListsRequest
+{
+    my $self = shift;
+    my %args;
+    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+    
+    my $iq = $self->_iq();
+    $iq->SetIQ(type=>"get");
+    my $query = $iq->NewChild("jabber:iq:privacy");
+
+    if (exists($args{list}))
+    {
+        $query->AddList(name=>$args{list});
+    }
+
+    $self->Send($iq);
+}
+
+
+##############################################################################
+#
+# PrivacyListsSet - Sends an empty IQ to the server to request that the
+#                       user's privacy lists be sent to them, and return to
+#                       let the user's program handle parsing the return packet.
+#
+##############################################################################
+sub PrivacyListsSet
+{
+    my $self = shift;
+    my %args;
+    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+    
+    my $iq = $self->_iq();
+    $iq->SetIQ(type=>"set");
+    my $query = $iq->NewChild("jabber:iq:privacy");
+
+    #XXX error check that there is a list
+    my $list = $query->AddList(name=>$args{list});
+
+    foreach my $item (@{$args{items}})
+    {
+        $list->AddItem(%{$item});
+    }
+
+    $iq = $self->SendAndReceiveWithID($iq);
+    return unless defined($iq);
+
+    return if $iq->DefinedError();
+
+    return 1;
+}
+
+
+###############################################################################
+#
+# RegisterRequest - This is a self contained function to send an iq tag
+#                   an id that requests the target address to send back
+#                   the required fields.  It waits for a reply what the
+#                   same id to come back and tell the caller what the
+#                   fields are.
+#
+###############################################################################
+sub RegisterRequest
+{
+    my $self = shift;
+    my %args;
+    $args{mode} = "block";
+    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+
+    my $timeout = exists($args{timeout}) ? delete($args{timeout}) : undef;
+
+    #--------------------------------------------------------------------------
+    # Create a Net::XMPP::IQ object to send to the server
+    #--------------------------------------------------------------------------
+    my $iq = $self->_iq();
+    $iq->SetIQ(to=>delete($args{to})) if exists($args{to});
+    $iq->SetIQ(type=>"get");
+    my $query = $iq->NewChild("jabber:iq:register");
+
+    #--------------------------------------------------------------------------
+    # Send the IQ with the next available ID and wait for a reply with that
+    # id to be received.  Then grab the IQ reply.
+    #--------------------------------------------------------------------------
+    if ($args{mode} eq "passthru")
+    {
+        my $id = $self->UniqueID();
+        $iq->SetIQ(id=>$id);
+        $self->Send($iq);
+        return $id;
+    }
+    
+    return $self->SendWithID($iq) if ($args{mode} eq "nonblock");
+
+    $iq = $self->SendAndReceiveWithID($iq,$timeout);
+
+    #--------------------------------------------------------------------------
+    # Check if there was an error.
+    #--------------------------------------------------------------------------
+    return unless defined($iq);
+    if ($iq->GetType() eq "error")
+    {
+        $self->SetErrorCode($iq->GetErrorCode().": ".$iq->GetError());
+        return;
+    }
+
+    my %register;
+    #--------------------------------------------------------------------------
+    # From the reply IQ determine what fields are required and send a hash
+    # back with the fields and any values that are already defined (like key)
+    #--------------------------------------------------------------------------
+    $query = $iq->GetChild();
+    $register{fields} = { $query->GetRegister() };
+
+    return %register;
+}
+
+
+###############################################################################
+#
+# RegisterSend - This is a self contained function to send a registration
+#                iq tag with an id.  Then wait for a reply what the same
+#                id to come back and tell the caller what the result was.
+#
+###############################################################################
+sub RegisterSend
+{
+    my $self = shift;
+    my %args;
+    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+
+    #--------------------------------------------------------------------------
+    # Create a Net::XMPP::IQ object to send to the server
+    #--------------------------------------------------------------------------
+    my $iq = $self->_iq();
+    $iq->SetIQ(to=>delete($args{to})) if exists($args{to});
+    $iq->SetIQ(type=>"set");
+    my $iqRegister = $iq->NewChild("jabber:iq:register");
+    $iqRegister->SetRegister(%args);
+
+    #--------------------------------------------------------------------------
+    # Send the IQ with the next available ID and wait for a reply with that
+    # id to be received.  Then grab the IQ reply.
+    #--------------------------------------------------------------------------
+    $iq = $self->SendAndReceiveWithID($iq);
+
+    #--------------------------------------------------------------------------
+    # From the reply IQ determine if we were successful or not.  If yes then
+    # return "".  If no then return error string from the reply.
+    #--------------------------------------------------------------------------
+    return unless defined($iq);
+    return ( $iq->GetErrorCode() , $iq->GetError() )
+        if ($iq->GetType() eq "error");
+    return ("ok","");
+}
+
+
+##############################################################################
+#
 # RosterAdd - Takes the Jabber ID of the user to add to their Roster and
 #             sends the IQ packet to the server.
 #
-###############################################################################
+##############################################################################
 sub RosterAdd
 {
     my $self = shift;
     my %args;
     while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
 
-    my $iq = new Net::XMPP::IQ();
+    my $iq = $self->_iq();
     $iq->SetIQ(type=>"set");
-    my $roster = $iq->NewQuery("jabber:iq:roster");
+    my $roster = $iq->NewChild("jabber:iq:roster");
     my $item = $roster->AddItem();
     $item->SetItem(%args);
 
@@ -1736,12 +2262,12 @@ sub RosterAdd
 }
 
 
-###############################################################################
+##############################################################################
 #
 # RosterAdd - Takes the Jabber ID of the user to remove from their Roster
 #             and sends the IQ packet to the server.
 #
-###############################################################################
+##############################################################################
 sub RosterRemove
 {
     my $self = shift;
@@ -1749,93 +2275,286 @@ sub RosterRemove
     while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
     delete($args{subscription});
 
-    my $iq = new Net::XMPP::IQ();
+    my $iq = $self->_iq();
     $iq->SetIQ(type=>"set");
-    my $roster = $iq->NewQuery("jabber:iq:roster");
+    my $roster = $iq->NewChild("jabber:iq:roster");
     my $item = $roster->AddItem();
     $item->SetItem(%args,
-         subscription=>"remove");
+                   subscription=>"remove");
     $self->Send($iq);
 }
 
 
-###############################################################################
+##############################################################################
 #
 # RosterParse - Returns a hash of roster items.
 #
-###############################################################################
+##############################################################################
 sub RosterParse
 {
     my $self = shift;
     my($iq) = @_;
 
-    my $query = $iq->GetQuery();
-    my @items = $query->GetItems();
-
     my %roster;
-    foreach my $item (@items)
+    my $query = $iq->GetChild("jabber:iq:roster");
+
+    if (defined($query)) #$query->GetXMLNS() eq "jabber:iq:roster")
     {
-        my $jid = $item->GetJID();
-        $roster{$jid}->{name} = $item->GetName();
-        $roster{$jid}->{subscription} = $item->GetSubscription();
-        $roster{$jid}->{ask} = $item->GetAsk();
-        $roster{$jid}->{groups} = [ $item->GetGroup() ];
+        my @items = $query->GetItems();
+
+        foreach my $item (@items)
+        {
+            my $jid = $item->GetJID();
+            $roster{$jid}->{name} = $item->GetName();
+            $roster{$jid}->{subscription} = $item->GetSubscription();
+            $roster{$jid}->{ask} = $item->GetAsk();
+            $roster{$jid}->{groups} = [ $item->GetGroup() ];
+        }
     }
 
     return %roster;
 }
 
 
-###############################################################################
+##############################################################################
 #
 # RosterGet - Sends an empty IQ to the server to request that the user's
 #             Roster be sent to them.  Returns a hash of roster items.
 #
-###############################################################################
+##############################################################################
 sub RosterGet
 {
     my $self = shift;
 
-    my $iq = new Net::XMPP::IQ();
+    my $iq = $self->_iq();
     $iq->SetIQ(type=>"get");
-    my $query = $iq->NewQuery("jabber:iq:roster");
+    my $query = $iq->NewChild("jabber:iq:roster");
 
     $iq = $self->SendAndReceiveWithID($iq);
+
     return unless defined($iq);
 
     return $self->RosterParse($iq);
 }
 
 
-###############################################################################
+##############################################################################
 #
 # RosterRequest - Sends an empty IQ to the server to request that the user's
 #                 Roster be sent to them, and return to let the user's program
 #                 handle parsing the return packet.
 #
-###############################################################################
+##############################################################################
 sub RosterRequest
 {
     my $self = shift;
 
-    my $iq = new Net::XMPP::IQ();
+    my $iq = $self->_iq();
     $iq->SetIQ(type=>"get");
-    my $query = $iq->NewQuery("jabber:iq:roster");
+    my $query = $iq->NewChild("jabber:iq:roster");
 
     $self->Send($iq);
 }
 
 
+##############################################################################
+#
+# Roster - Initialize a Net::XMPP::Roster object and return it.
+#
+##############################################################################
+sub Roster
+{
+    my $self = shift;
+
+    return new Net::XMPP::Roster(connection=>$self);
+}
+
+
+##############################################################################
+#
+# RosterDB - initialize the module to use the roster database
+#
+##############################################################################
+sub RosterDB
+{
+    my $self = shift;
+
+    $self->SetXPathCallBacks('/iq[@type="result" or @type="set"]/query[@xmlns="jabber:iq:roster"]'=>sub{ shift; $self->RosterDBParse(@_) });
+}
+
+
+##############################################################################
+#
+# RosterDBAdd - adds the entry to the Roster DB.
+#
+##############################################################################
+sub RosterDBAdd
+{
+    my $self = shift;
+    my ($jid,%item) = @_;
+
+    $self->{ROSTERDB}->{JIDS}->{$jid} = \%item;
+
+    foreach my $group (@{$item{groups}})
+    {
+        $self->{ROSTERDB}->{GROUPS}->{$group}->{$jid} = 1;
+    }
+}
+
+
 ###############################################################################
+#
+# RosterDBClear - delete all of the JIDs from the DB completely.
+#
+###############################################################################
+sub RosterDBClear
+{
+    my $self = shift;
+
+    $self->{DEBUG}->Log1("RosterDBClear: clearing the database");
+    foreach my $jid ($self->RosterDBJIDs())
+    {
+        $self->{DEBUG}->Log3("RosterDBClear: deleting ",$jid->GetJID()," from the DB");
+        $self->RosterDBRemove($jid);
+    }
+    $self->{DEBUG}->Log3("RosterDBClear: database is empty");
+}
+
+
+##############################################################################
+#
+# RosterDBExists - allows you to query if the JID exists in the Roster DB.
+#
+##############################################################################
+sub RosterDBExists
+{
+    my $self = shift;
+    my ($jid) = @_;
+
+    if ($jid->isa("Net::XMPP::JID"))
+    {
+        $jid = $jid->GetJID();
+    }
+    
+    return unless exists($self->{ROSTERDB});
+    return unless exists($self->{ROSTERDB}->{JIDS});
+    return unless exists($self->{ROSTERDB}->{JIDS}->{$jid});
+    return 1;
+}
+
+
+##############################################################################
+#
+# RosterDBGroupExists - allows you to query if the group exists in the Roster
+#                       DB.
+#
+##############################################################################
+sub RosterDBGroupExists
+{
+    my $self = shift;
+    my ($group) = @_;
+
+    return unless exists($self->{ROSTERDB});
+    return unless exists($self->{ROSTERDB}->{GROUPS});
+    return unless exists($self->{ROSTERDB}->{GROUPS}->{$group});
+    return 1;
+}
+
+
+##############################################################################
+#
+# RosterDBGroupJIDs - returns a list of the current groups in your roster.
+#
+##############################################################################
+sub RosterDBGroupJIDs
+{
+    my $self = shift;
+    my $group = shift;
+
+    return unless $self->RosterDBGroupExists($group);
+    my @jids;
+    foreach my $jid (keys(%{$self->{ROSTERDB}->{GROUPS}->{$group}}))
+    {
+        push(@jids,$self->_jid($jid));
+    }
+    return @jids;
+}
+
+
+##############################################################################
+#
+# RosterDBGroups - returns a list of the current groups in your roster.
+#
+##############################################################################
+sub RosterDBGroups
+{
+    my $self = shift;
+
+    return () unless exists($self->{ROSTERDB}->{GROUPS});
+    return () if (scalar(keys(%{$self->{ROSTERDB}->{GROUPS}})) == 0);
+    return keys(%{$self->{ROSTERDB}->{GROUPS}});
+}
+
+
+##############################################################################
+#
+# RosterDBJIDs - returns a list of all of the JIDs in your roster.
+#
+##############################################################################
+sub RosterDBJIDs
+{
+    my $self = shift;
+    my $group = shift;
+
+    my @jids;
+
+    return () unless exists($self->{ROSTERDB});
+    return () unless exists($self->{ROSTERDB}->{JIDS});
+    foreach my $jid (keys(%{$self->{ROSTERDB}->{JIDS}}))
+    {
+        push(@jids,$self->_jid($jid));
+    }
+    return @jids;
+}
+
+
+##############################################################################
+#
+# RosterDBNonGroupJIDs - returns a list of the JIDs not in a group.
+#
+##############################################################################
+sub RosterDBNonGroupJIDs
+{
+    my $self = shift;
+    my $group = shift;
+
+    my @jids;
+
+    return () unless exists($self->{ROSTERDB});
+    return () unless exists($self->{ROSTERDB}->{JIDS});
+    foreach my $jid (keys(%{$self->{ROSTERDB}->{JIDS}}))
+    {
+        next if (exists($self->{ROSTERDB}->{JIDS}->{$jid}->{groups}) &&
+                 ($#{$self->{ROSTERDB}->{JIDS}->{$jid}->{groups}} > -1));
+
+        push(@jids,$self->_jid($jid));
+    }
+    return @jids;
+}
+
+
+##############################################################################
 #
 # RosterDBParse - takes an iq packet that containsa roster, parses it, and puts
 #                 the roster into the Roster DB.
 #
-###############################################################################
+##############################################################################
 sub RosterDBParse
 {
     my $self = shift;
     my ($iq) = @_;
+
+    #print "RosterDBParse: iq(",$iq->GetXML(),")\n";
 
     my $type = $iq->GetType();
     return unless (($type eq "set") || ($type eq "result"));
@@ -1846,11 +2565,11 @@ sub RosterDBParse
 }
 
 
-###############################################################################
+##############################################################################
 #
 # RosterDBProcessParsed - takes a parsed roster and puts it into the Roster DB.
 #
-###############################################################################
+##############################################################################
 sub RosterDBProcessParsed
 {
     my $self = shift;
@@ -1858,11 +2577,9 @@ sub RosterDBProcessParsed
 
     foreach my $jid (keys(%roster))
     {
-        if ($roster{$jid}->{subscription} eq "remove")
-        {
-            $self->RosterDBRemove($jid);
-        }
-        else
+        $self->RosterDBRemove($jid);
+
+        if ($roster{$jid}->{subscription} ne "remove")
         {
             $self->RosterDBAdd($jid, %{$roster{$jid}} );
         }
@@ -1870,66 +2587,514 @@ sub RosterDBProcessParsed
 }
 
 
-###############################################################################
+##############################################################################
 #
-# RosterDBAdd - adds the entry to the Roster DB.
+# RosterDBQuery - allows you to get one of the pieces of info from the
+#                 Roster DB.
 #
-###############################################################################
-sub RosterDBAdd
+##############################################################################
+sub RosterDBQuery
 {
     my $self = shift;
-    my ($jid,%item) = @_;
+    my $jid = shift;
+    my $key = shift;
 
-    $self->{ROSTERDB}->{$jid} = \%item;
-}
+    if ($jid->isa("Net::XMPP::JID"))
+    {
+        $jid = $jid->GetJID();
+    }
+    
+    return unless $self->RosterDBExists($jid);
+    if (defined($key))
+    {
+        return unless exists($self->{ROSTERDB}->{JIDS}->{$jid}->{$key});
+        return $self->{ROSTERDB}->{JIDS}->{$jid}->{$key};
+    }
+    return %{$self->{ROSTERDB}->{JIDS}->{$jid}};
+}                        
 
 
-###############################################################################
+##############################################################################
 #
 # RosterDBRemove - removes the JID from the Roster DB.
 #
-###############################################################################
+##############################################################################
 sub RosterDBRemove
 {
     my $self = shift;
     my ($jid) = @_;
 
-    delete($self->{ROSTERDB}->{$jid}) if exists($self->{ROSTERDB}->{$jid});
+    if ($self->RosterDBExists($jid))
+    {
+        if (defined($self->RosterDBQuery($jid,"groups")))
+        {
+            foreach my $group (@{$self->RosterDBQuery($jid,"groups")})
+            {
+                delete($self->{ROSTERDB}->{GROUPS}->{$group}->{$jid});
+                delete($self->{ROSTERDB}->{GROUPS}->{$group})
+                    if (scalar(keys(%{$self->{ROSTERDB}->{GROUPS}->{$group}})) == 0);
+                delete($self->{ROSTERDB}->{GROUPS})
+                    if (scalar(keys(%{$self->{ROSTERDB}->{GROUPS}})) == 0);
+            }
+        }
+    
+        delete($self->{ROSTERDB}->{JIDS}->{$jid});
+    }
+}
+
+
+
+
+##############################################################################
+#+----------------------------------------------------------------------------
+#|
+#| TLS Functions
+#|
+#+----------------------------------------------------------------------------
+##############################################################################
+
+##############################################################################
+#
+# TLSInit - Initialize the connection for TLS.
+#
+##############################################################################
+sub TLSInit
+{
+    my $self = shift;
+
+    $TLS_CALLBACK = sub{ $self->ProcessTLSStanza( @_ ) };
+    $self->SetDirectXPathCallBacks('/[@xmlns="'.&ConstXMLNS("xmpp-tls").'"]'=>$TLS_CALLBACK);
+}
+
+
+##############################################################################
+#
+# ProcessTLSStanza - process a TLS based packet.
+#
+##############################################################################
+sub ProcessTLSStanza
+{
+    my $self = shift;
+    my $sid = shift;
+    my $node = shift;
+
+    my $tag = &XML::Stream::XPath($node,"name()");
+
+    if ($tag eq "failure")
+    {
+        $self->TLSClientFailure($node);
+    }
+    
+    if ($tag eq "proceed")
+    {
+        $self->TLSClientProceed($node);
+    }
+}
+
+
+##############################################################################
+#
+# TLSStart - client function to have the socket start TLS.
+#
+##############################################################################
+sub TLSStart
+{
+    my $self = shift;
+    my $timeout = shift;
+    $timeout = 120 unless defined($timeout);
+    $timeout = 120 if ($timeout eq "");
+    
+    $self->TLSSendStartTLS();
+
+    my $endTime = time + $timeout;
+    while(!$self->TLSClientDone() && ($endTime >= time))
+    {
+        $self->Process();
+    }
+
+    if (!$self->TLSClientSecure())
+    {
+        return;
+    }
+
+    $self->RestartStream($timeout);
+}
+
+
+##############################################################################
+#
+# TLSClientProceed - handle a <proceed/> packet.
+#
+##############################################################################
+sub TLSClientProceed
+{
+    my $self = shift;
+    my $node = shift;
+
+    my ($status,$message) = $self->{STREAM}->StartTLS($self->GetStreamID());
+
+    if ($status)
+    {
+        $self->{TLS}->{done} = 1;
+        $self->{TLS}->{secure} = 1;
+    }
+    else
+    {
+        $self->{TLS}->{done} = 1;
+        $self->{TLS}->{error} = $message;
+    }
+    
+    $self->RemoveDirectXPathCallBacks('/[@xmlns="'.&ConstXMLNS("xmpp-tls").'"]'=>$TLS_CALLBACK);
+}
+
+
+##############################################################################
+#
+# TLSClientSecure - return 1 if the socket is secure, 0 otherwise.
+#
+##############################################################################
+sub TLSClientSecure
+{
+    my $self = shift;
+    
+    return $self->{TLS}->{secure};
+}
+
+
+##############################################################################
+#
+# TLSClientDone - return 1 if the TLS process is done
+#
+##############################################################################
+sub TLSClientDone
+{
+    my $self = shift;
+    
+    return $self->{TLS}->{done};
+}
+
+
+##############################################################################
+#
+# TLSClientError - return the TLS error if any
+#
+##############################################################################
+sub TLSClientError
+{
+    my $self = shift;
+    
+    return $self->{TLS}->{error};
+}
+
+
+##############################################################################
+#
+# TLSClientFailure - handle a <failure/>
+#
+##############################################################################
+sub TLSClientFailure
+{
+    my $self = shift;
+    my $node = shift;
+    
+    my $type = &XML::Stream::XPath($node,"*/name()");
+
+    $self->{TLS}->{error} = $type;
+    $self->{TLS}->{done} = 1;
+}
+
+
+##############################################################################
+#
+# TLSSendFailure - Send a <failure/> in the TLS namespace
+#
+##############################################################################
+sub TLSSendFailure
+{
+    my $self = shift;
+    my $type = shift;
+    
+    $self->Send("<failure xmlns='".&ConstXMLNS('xmpp-tls')."'><${type}/></failure>");
+}
+
+
+##############################################################################
+#
+# TLSSendStartTLS - send a <starttls/> in the TLS namespace.
+#
+##############################################################################
+sub TLSSendStartTLS
+{
+    my $self = shift;
+
+    $self->Send("<starttls xmlns='".&ConstXMLNS('xmpp-tls')."'/>");
+}
+
+
+
+
+##############################################################################
+#+----------------------------------------------------------------------------
+#|
+#| SASL Functions
+#|
+#+----------------------------------------------------------------------------
+##############################################################################
+
+##############################################################################
+#
+# SASLInit - Initialize the connection for SASL.
+#
+##############################################################################
+sub SASLInit
+{
+    my $self = shift;
+
+    $SASL_CALLBACK = sub{ $self->ProcessSASLStanza( @_ ) };
+    $self->SetDirectXPathCallBacks('/[@xmlns="'.&ConstXMLNS("xmpp-sasl").'"]'=> $SASL_CALLBACK);
+}
+
+
+##############################################################################
+#
+# ProcessSASLStanza - process a SASL based packet.
+#
+##############################################################################
+sub ProcessSASLStanza
+{
+    my $self = shift;
+    my $sid = shift;
+    my $node = shift;
+
+    my $tag = &XML::Stream::XPath($node,"name()");
+
+    if ($tag eq "challenge")
+    {
+        $self->SASLAnswerChallenge($node);
+    }
+    
+    if ($tag eq "failure")
+    {
+        $self->SASLClientFailure($node);
+    }
+    
+    if ($tag eq "success")
+    {
+        $self->SASLClientSuccess($node);
+    }
+}
+
+
+##############################################################################
+#
+# SASLAnswerChallenge - when we get a <challenge/> we need to do the grunt
+#                       work to return a <response/>.
+#
+##############################################################################
+sub SASLAnswerChallenge
+{
+    my $self = shift;
+    my $node = shift;
+
+    my $challenge64 = &XML::Stream::XPath($node,"text()");
+    my $challenge = MIME::Base64::decode_base64($challenge64);
+    
+    my $response = $self->SASLGetClient()->client_step($challenge);
+
+    my $response64 = MIME::Base64::encode_base64($response,"");
+    $self->SASLSendResponse($response64);
 }
 
 
 ###############################################################################
 #
-# RosterDBQuery - allows you to get one of the pieces of info from the
-#                 Roster DB.
+# SASLClient - This is a helper function to perform all of the required steps
+#              for doing SASL with the server.
 #
 ###############################################################################
-sub RosterDBQuery
+sub SASLClient
 {
     my $self = shift;
-    my ($jid,$key) = @_;
+    my $username = shift;
+    my $password = shift;
 
-    return unless exists($self->{ROSTERDB});
-    return unless exists($self->{ROSTERDB}->{$jid});
-    return unless exists($self->{ROSTERDB}->{$jid}->{$key});
-    return $self->{ROSTERDB}->{$jid}->{$key};
-}                        
+    my $mechanisms = $self->GetStreamFeature("xmpp-sasl");
+
+    return unless defined($mechanisms);
+    
+    my $sasl = new Authen::SASL(mechanism=>join(" ",@{$mechanisms}),
+                                callback=>{ user => $username,
+                                            pass => $password
+                                          }
+                               );
+
+    $self->{SASL}->{client} = $sasl->client_new();
+    $self->{SASL}->{username} = $username;
+    $self->{SASL}->{password} = $password;
+    $self->{SASL}->{authed} = 0;
+    $self->{SASL}->{done} = 0;
+
+    $self->SASLSendAuth();
+}
+
+
+##############################################################################
+#
+# SASLClientAuthed - return 1 if we authed via SASL, 0 otherwise
+#
+##############################################################################
+sub SASLClientAuthed
+{
+    my $self = shift;
+    
+    return $self->{SASL}->{authed};
+}
+
+
+##############################################################################
+#
+# SASLClientDone - return 1 if the SASL process is finished
+#
+##############################################################################
+sub SASLClientDone
+{
+    my $self = shift;
+    
+    return $self->{SASL}->{done};
+}
+
+
+##############################################################################
+#
+# SASLClientError - return the error if any
+#
+##############################################################################
+sub SASLClientError
+{
+    my $self = shift;
+    
+    return $self->{SASL}->{error};
+}
+
+
+##############################################################################
+#
+# SASLClientFailure - handle a received <failure/>
+#
+##############################################################################
+sub SASLClientFailure
+{
+    my $self = shift;
+    my $node = shift;
+    
+    my $type = &XML::Stream::XPath($node,"*/name()");
+
+    $self->{SASL}->{error} = $type;
+    $self->{SASL}->{done} = 1;
+}
+
+
+##############################################################################
+#
+# SASLClientSuccess - handle a received <success/>
+#
+##############################################################################
+sub SASLClientSuccess
+{
+    my $self = shift;
+    my $node = shift;
+    
+    $self->{SASL}->{authed} = 1;
+    $self->{SASL}->{done} = 1;
+
+    $self->RemoveDirectXPathCallBacks('/[@xmlns="'.&ConstXMLNS("xmpp-sasl").'"]'=>$SASL_CALLBACK);
+}
 
 
 ###############################################################################
-#+-----------------------------------------------------------------------------
+#
+# SASLGetClient - This is a helper function to return the SASL client object.
+#
+###############################################################################
+sub SASLGetClient
+{
+    my $self = shift;
+    
+    return $self->{SASL}->{client};
+}
+
+
+##############################################################################
+#
+# SASLSendAuth - send an <auth/> in the SASL namespace
+#
+##############################################################################
+sub SASLSendAuth
+{
+    my $self = shift;
+
+    $self->Send("<auth xmlns='".&ConstXMLNS('xmpp-sasl')."' mechanism='".$self->SASLGetClient()->mechanism()."'/>");
+}
+
+
+##############################################################################
+#
+# SASLSendChallenge - Send a <challenge/> in the SASL namespace
+#
+##############################################################################
+sub SASLSendChallenge
+{
+    my $self = shift;
+    my $challenge = shift;
+
+    $self->Send("<challenge xmlns='".&ConstXMLNS('xmpp-sasl')."'>${challenge}</challenge>");
+}
+
+
+##############################################################################
+#
+# SASLSendFailure - Send a <failure/> tag in the SASL namespace
+#
+##############################################################################
+sub SASLSendFailure
+{
+    my $self = shift;
+    my $type = shift;
+    
+    $self->Send("<failure xmlns='".&ConstXMLNS('xmpp-sasl')."'><${type}/></failure>");
+}
+
+
+##############################################################################
+#
+# SASLSendResponse - Send a <response/> tag in the SASL namespace
+#
+##############################################################################
+sub SASLSendResponse
+{
+    my $self = shift;
+    my $response = shift;
+
+    $self->Send("<response xmlns='".&ConstXMLNS('xmpp-sasl')."'>${response}</response>");
+}
+
+
+
+
+##############################################################################
+#+----------------------------------------------------------------------------
 #|
 #| Default CallBacks
 #|
-#+-----------------------------------------------------------------------------
-###############################################################################
+#+----------------------------------------------------------------------------
+##############################################################################
 
 
-###############################################################################
+##############################################################################
 #
 # callbackInit - initialize the default callbacks
 #
-###############################################################################
+##############################################################################
 sub callbackInit
 {
     my $self = shift;
@@ -1939,20 +3104,22 @@ sub callbackInit
                         message=>sub{ $self->callbackMessage(@_) },
                         );
 
-    $self->SetPresenceCallBacks(available=>sub{ $self->callbackPresenceAvailable(@_) },
-                                subscribe=>sub{ $self->callbackPresenceSubscribe(@_) },
+    $self->SetPresenceCallBacks(subscribe=>sub{ $self->callbackPresenceSubscribe(@_) },
                                 unsubscribe=>sub{ $self->callbackPresenceUnsubscribe(@_) },
                                 subscribed=>sub{ $self->callbackPresenceSubscribed(@_) },
                                 unsubscribed=>sub{ $self->callbackPresenceUnsubscribed(@_) },
                                );
+
+    $self->TLSInit();
+    $self->SASLInit();
 }
 
 
-###############################################################################
+##############################################################################
 #
 # callbackMessage - default callback for <message/> packets.
 #
-###############################################################################
+##############################################################################
 sub callbackMessage
 {
     my $self = shift;
@@ -1970,11 +3137,11 @@ sub callbackMessage
 }
 
 
-###############################################################################
+##############################################################################
 #
 # callbackPresence - default callback for <presence/> packets.
 #
-###############################################################################
+##############################################################################
 sub callbackPresence
 {
     my $self = shift;
@@ -1992,19 +3159,19 @@ sub callbackPresence
 }
 
 
-###############################################################################
+##############################################################################
 #
 # callbackIQ - default callback for <iq/> packets.
 #
-###############################################################################
+##############################################################################
 sub callbackIQ
 {
     my $self = shift;
     my $sid = shift;
     my $iq = shift;
 
-    return unless $iq->DefinedQuery();
-    my $query = $iq->GetQuery();
+    return unless $iq->DefinedChild();
+    my $query = $iq->GetChild();
     return unless defined($query);
 
     my $type = $iq->GetType();
@@ -2015,35 +3182,20 @@ sub callbackIQ
     {
         &{$self->{CB}->{IQns}->{$ns}}($sid,$iq);
 
-    } elsif (exists($self->{CB}->{IQns}->{$ns}->{$type}) &&
-             (ref($self->{CB}->{IQns}->{$ns}->{$type}) eq "CODE"))
+    }
+    elsif (exists($self->{CB}->{IQns}->{$ns}->{$type}) &&
+           (ref($self->{CB}->{IQns}->{$ns}->{$type}) eq "CODE"))
     {
         &{$self->{CB}->{IQns}->{$ns}->{$type}}($sid,$iq);
     }
 }
 
 
-###############################################################################
-#
-# callbackPresenceAvailable - default callback for available packets.
-#
-###############################################################################
-sub callbackPresenceAvailable
-{ 
-    my $self = shift;
-    my $sid = shift;
-    my $presence = shift;
-
-    my $reply = $presence->Reply();
-    $self->Send($reply,1);
-}
-
-
-###############################################################################
+##############################################################################
 #
 # callbackPresenceSubscribe - default callback for subscribe packets.
 #
-###############################################################################
+##############################################################################
 sub callbackPresenceSubscribe
 {
     my $self = shift;
@@ -2057,11 +3209,11 @@ sub callbackPresenceSubscribe
 }
 
 
-###############################################################################
+##############################################################################
 #
 # callbackPresenceUnsubscribe - default callback for unsubscribe packets.
 #
-###############################################################################
+##############################################################################
 sub callbackPresenceUnsubscribe
 {
     my $self = shift;
@@ -2073,11 +3225,11 @@ sub callbackPresenceUnsubscribe
 }
 
    
-###############################################################################
+##############################################################################
 #
 # callbackPresenceSubscribed - default callback for subscribed packets.
 #
-###############################################################################
+##############################################################################
 sub callbackPresenceSubscribed
 {
     my $self = shift;
@@ -2089,11 +3241,11 @@ sub callbackPresenceSubscribed
 }
 
 
-###############################################################################
+##############################################################################
 #
 # callbackPresenceUnsubscribed - default callback for unsubscribed packets.
 #
-###############################################################################
+##############################################################################
 sub callbackPresenceUnsubscribed
 {
     my $self = shift;
@@ -2102,6 +3254,55 @@ sub callbackPresenceUnsubscribed
 
     my $reply = $presence->Reply(type=>"unsubscribed");
     $self->Send($reply,1);
+}
+
+
+
+##############################################################################
+#+----------------------------------------------------------------------------
+#|
+#| Stream functions
+#|
+#+----------------------------------------------------------------------------
+##############################################################################
+sub GetStreamID
+{
+    my $self = shift;
+
+    return $self->{SESSION}->{id};
+}
+
+
+sub GetStreamFeature
+{
+    my $self = shift;
+    my $feature = shift;
+
+    return $self->{STREAM}->GetStreamFeature($self->GetStreamID(),$feature);
+}
+
+
+sub RestartStream
+{
+    my $self = shift;
+    my $timeout = shift;
+
+    $self->{SESSION} =
+        $self->{STREAM}->OpenStream($self->GetStreamID(),$timeout);
+    return $self->GetStreamID();
+}
+
+
+##############################################################################
+#
+# ConstXMLNS - Return the namespace from the constant string.
+#
+##############################################################################
+sub ConstXMLNS
+{
+    my $const = shift;
+    
+    return $XMLNS{$const};
 }
 
 
