@@ -1,0 +1,9 @@
+
+0.1
+===
+  - Initial port from Net::Jabber.  This will ultimatly end up being
+    an inheritable base for doing XMPP connections.  Net::Jabber will
+    be re-written to use Net::XMPP for base connections and simply
+    provide the Jabber extensions that the Jabber Software Foundation
+    is managing.
+

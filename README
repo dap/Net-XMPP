@@ -1,0 +1,43 @@
+Net::XMPP v0.1
+
+
+DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+
+
+This module is being used a placeholder to reserve the Net::XMPP module
+namespace while I finish up a working version and a new revision of
+Net::Jabber that uses it.
+
+Please continue using Net::Jabber until this module reaches v1.0.
+
+
+DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!  DO NOT USE THIS MODULE!!!
+
+
+Ryan Eatmon
+reatmon@jabber.org
+
+
+REQUIREMENTS
+  - XML::Stream     - Handles the connection between the Client and the Server.
+  - Digest::SHA1    - Encrypted authorization so that your password is not sent
+                      over unsecure XML.
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+STATUS
+
+  Very very very very alpha.  It will not work.  I promise you that.
+
+Please send any bug reports to reatmon@jabber.org.
+
+2004/01/16
+
