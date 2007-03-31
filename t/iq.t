@@ -1,4 +1,4 @@
-use lib "t/lib";
+#use lib "t/lib";
 use Test::More tests=>115;
 
 BEGIN{ use_ok( "Net::XMPP" ); }

@@ -1,24 +1,26 @@
 
 sub testDefined
 {
-    my ($obj, $tag) = @_;
+    my ($obj, $tag, $name) = @_;
     my $ltag = lc($tag);
+	$name = "" unless defined $name;
 
     my $defined;
     eval "\$defined = \$obj->Defined$tag();";
     die($@) if ($@);
-    is( $defined, 1, "$ltag defined" );
+    is( $defined, 1, "$name: $ltag defined" );
 }
 
 sub testNotDefined
 {
-    my ($obj, $tag) = @_;
+    my ($obj, $tag, $name) = @_;
     my $ltag = lc($tag);
+	$name = "" unless defined $name;
 
     my $defined;
     eval "\$defined = \$obj->Defined$tag();";
     die($@) if ($@);
-    is( $defined, '', "$ltag not defined" );
+    is( $defined, '', "$name: $ltag not defined" );
 }
 
 sub testDefinedField
@@ -34,8 +36,8 @@ sub testScalar
     my ($obj, $tag, $value) = @_;
     my $ltag = lc($tag);
 
-    testNotDefined(@_);
-    testSetScalar(@_); 
+    testNotDefined($obj, $tag, "Scalar");
+    testSetScalar(@_);
 }
 
 sub testSetScalar
@@ -53,10 +55,10 @@ sub testRemove
     my ($obj, $tag) = @_;
     my $ltag = lc($tag);
 
-    testDefined(@_);
+    testDefined($obj, $tag, "Remove");
     eval "\$obj->Remove$tag();";
     die($@) if ($@);
-    testNotDefined(@_);
+    testNotDefined($obj, $tag, "Remove");
 }
 
 sub testPostScalar
@@ -64,7 +66,7 @@ sub testPostScalar
     my ($obj, $tag, $value) = @_;
     my $ltag = lc($tag);
 
-    testDefined(@_);
+    testDefined($obj, $tag, "PostScalar");
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
@@ -87,13 +89,13 @@ sub testFlag
     my ($obj, $tag) = @_;
     my $ltag = lc($tag);
 
-    testNotDefined($obj,$tag,'');
+    testNotDefined($obj,$tag,"Flag");
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
     die($@) if ($@);
     is( $get, '', "$ltag  is not set" );
-    testSetFlag(@_); 
+    testSetFlag(@_);
 }
 
 sub testSetFlag
@@ -111,7 +113,7 @@ sub testPostFlag
     my ($obj, $tag) = @_;
     my $ltag = lc($tag);
 
-    testDefined(@_);
+    testDefined($obj, $tag, "PostFlag");
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
@@ -134,7 +136,7 @@ sub testJID
     my ($obj, $tag, $user, $server, $resource) = @_;
     my $ltag = lc($tag);
 
-    testNotDefined(@_);
+    testNotDefined($obj, $tag, "JID");
     testSetJID(@_);
 }
 
@@ -157,7 +159,7 @@ sub testPostJID
 
     my $value = $user.'@'.$server.'/'.$resource;
 
-    testDefined(@_);
+    testDefined($obj, $tag,"PostJID");
 
     my $get;
     eval "\$get = \$obj->Get$tag();";
@@ -179,8 +181,8 @@ sub testFieldJID
     my ($hash, $tag, $user, $server, $resource) = @_;
     my $ltag = lc($tag);
 
-    testDefined(@_);
-    
+    testDefined( $obj, $tag, "FieldJID");
+
     my $jid = $hash->{$ltag};
     isa_ok( $jid, 'Net::XMPP::JID');
     is( $jid->GetUserID(), $user , "user eq '$user'");

@@ -203,15 +203,15 @@ Net::XMPP::Message - XMPP Message Module
   RemoveTo() - removes the to attribute from the <message/>.
 
                $Mess->RemoveTo();
-  
+
   RemoveFrom() - removes the from attribute from the <message/>.
 
                  $Mess->RemoveFrom();
-  
+
   RemoveType() - removes the type attribute from the <message/>.
 
                  $Mess->RemoveType();
-  
+
   RemoveSubject() - removes the <subject/> element from the
                     <message/>.
 
@@ -219,17 +219,17 @@ Net::XMPP::Message - XMPP Message Module
 
   RemoveBody() - removes the <body/> element from the
                  <message/>.
-                  
+
                  $Mess->RemoveBody();
 
   RemoveThread() - removes the <thread/> element from the <message/>.
 
                    $Mess->RemoveThread();
-  
+
   RemoveError() - removes the <error/> element from the <message/>.
 
                   $Mess->RemoveError();
-  
+
   RemoveErrorCode() - removes the code attribute from the <error/>
                       element in the <message/>.
 
@@ -283,8 +283,8 @@ Ryan Eatmon
 
 =head1 COPYRIGHT
 
-This module is free software, you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This module is free software, you can redistribute it and/or modify it
+under the LGPL.
 
 =cut
 
@@ -316,6 +316,12 @@ sub new
 
 sub _message { my $self = shift; return new Net::XMPP::Message(); }
 
+# Copied from Net::Jabber::Message because GetTimeStamp doesn't work without DefinedX
+sub GetX     { my $self = shift; $self->GetChild(@_);    }
+sub DefinedX { my $self = shift; $self->DefinedChild(@_); }
+sub NewX     { my $self = shift; $self->NewChild(@_);    }
+sub AddX     { my $self = shift; $self->AddChild(@_);    }
+sub RemoveX  { my $self = shift; $self->RemoveChild(@_); }
 
 $FUNCTIONS{Body}->{path}  = 'body/text()';
 

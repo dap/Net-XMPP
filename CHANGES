@@ -1,3 +1,25 @@
+1.0.2 $Id: CHANGES 28 2007-03-29 12:39:48Z hacker $
+===
+  - Fix bug in Stanza::_xpath_defined causing defined to pass when it shouldn't
+    which broke GetTimeStamp
+  - Added test get_time_stamps.test, disabled due to XML::Stream bug
+    on Windows.
+  - Copied *X subs from Net::Jabber::Message to Net::XMPP::Message
+  - added debugging in some Protocol subs that didn't have it, but not all
+  - disabled CODE checking in Protocol-Callback subs to be POE compatable
+    Should be put into registration, not on callback, but didn't do that yet
+  - changed mytestlib.pl to output more concise test names
+
+1.0.1
+===
+  - Fixed bug in Execute() where it would not reconnect correctly.
+    Thanks to bianchi.
+  - Fixed bad xpath in iq:register.  Thanks to Julian Yon.
+  - Fixed minor bug in tests thanks to Alexey Tourbin.
+    to dsanot.
+  - Fixed bug in default callbacks.  The inheritance model I was using
+    was completely screwed up.
+
 1.0
 ===
   - Should be stable enough for a 1.0 release.
