@@ -60,7 +60,7 @@ Net::XMPP::Client - XMPP Client Module
     $Con->Execute(hostname=>"jabber.org",
                   username=>"bob",
                   password=>"XXXX",
-                  resource=>"Work'
+                  resource=>"Work"
                  );
 
     #
