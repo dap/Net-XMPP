@@ -426,7 +426,7 @@ sub handleIQ
     my $self = shift;
     my $iq = shift;
 
-    print "handleIQ: iq(",$iq->GetXML(),")\n";
+    $self->{CONNECTION}->{DEBUG}->Log3('handleIQ: iq(' . $iq->GetXML() . ')');
 
     my $type = $iq->GetType();
     return unless (($type eq "set") || ($type eq "result"));
@@ -464,7 +464,7 @@ sub handlePresence
     my $self = shift;
     my $presence = shift;
 
-    print "handlePresence: presence(",$presence->GetXML(),")\n";
+    $self->{CONNECTION}->{DEBUG}->Log3('handlePresence: presence(' . $presence->GetXML() . ')');
 
     my $type = $presence->GetType();
     $type = "" unless defined($type);
