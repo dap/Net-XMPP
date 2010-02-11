@@ -9,7 +9,7 @@ my $builder = Module::Build->new(
     dist_abstract		=> 'XMPP Support Library',
     dist_version_from   => 'lib/Net/XMPP.pm',
     requires => {
-        'XML::Stream' => 1.22,
+        'XML::Stream'  => 1.23,
         'Digest::SHA1' => 1.02,
     	},
     create_makefile_pl => 'passthrough',
