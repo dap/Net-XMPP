@@ -765,6 +765,11 @@ under the LGPL.
 
 =cut
 
+use Authen::SASL;
+use Net::XMPP::IQ;
+use Net::XMPP::Message;
+use Net::XMPP::Presence;
+use Net::XMPP::JID;
 use Net::XMPP::Roster;
 use Net::XMPP::PrivacyLists;
 use strict;

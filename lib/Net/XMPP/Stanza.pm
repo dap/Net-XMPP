@@ -212,6 +212,9 @@ under the LGPL.
 
 use strict;
 use Carp;
+use XML::Stream::Node;
+use Net::XMPP::JID;
+use Net::XMPP::Debug;
 use Net::XMPP::Namespaces;
 use vars qw( $AUTOLOAD %FUNCTIONS $DEBUG );
 

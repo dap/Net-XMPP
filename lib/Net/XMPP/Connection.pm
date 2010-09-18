@@ -49,8 +49,12 @@ under the LGPL.
 
 use strict;
 use Carp;
-use base qw( Net::XMPP::Protocol );
 
+use XML::Stream;
+use Net::XMPP::Debug;
+use Net::XMPP::Protocol;
+
+use base qw( Net::XMPP::Protocol );
 
 sub new
 {

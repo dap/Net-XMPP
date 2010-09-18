@@ -220,6 +220,8 @@ under the LGPL.
 use strict;
 use Carp;
 
+use Net::XMPP::JID;
+
 sub new
 {
     my $proto = shift;
