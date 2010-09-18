@@ -145,6 +145,10 @@ sub Connect
                      (to => $self->{SERVER}->{componentname}) :
                      ()
                     ),
+                    (defined($self->{SERVER}->{srv}) ?
+                     (srv => '_xmpp-client._tcp') :
+                     ()
+                    ),
                    );
 
     if ($self->{SESSION})
