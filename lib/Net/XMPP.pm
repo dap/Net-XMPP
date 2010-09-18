@@ -225,7 +225,7 @@ use MIME::Base64;
 use POSIX;
 use vars qw( $AUTOLOAD $VERSION $PARSING );
 
-$VERSION = "1.02";
+$VERSION = "1.02_01";
 
 use Net::XMPP::Debug;
 use Net::XMPP::JID;
