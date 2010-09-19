@@ -212,7 +212,7 @@ under the LGPL.
 
 use strict;
 use Carp;
-use XML::Stream::Node;
+use XML::Stream 1.22 qw( Node );
 use Net::XMPP::JID;
 use Net::XMPP::Debug;
 use Net::XMPP::Namespaces;

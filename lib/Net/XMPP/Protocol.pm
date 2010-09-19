@@ -765,7 +765,10 @@ under the LGPL.
 
 =cut
 
+use Digest::SHA1;
+use MIME::Base64;
 use Authen::SASL;
+use XML::Stream;
 use Net::XMPP::IQ;
 use Net::XMPP::Message;
 use Net::XMPP::Presence;

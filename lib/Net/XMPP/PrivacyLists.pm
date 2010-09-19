@@ -54,6 +54,7 @@ under the LGPL.
 
 use strict;
 use Carp;
+use XML::Stream;
 
 sub new
 {

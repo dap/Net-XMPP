@@ -216,17 +216,13 @@ under the LGPL.
 
 require 5.005;
 use strict;
-use XML::Stream 1.22 qw( Node );
 use Time::Local;
-use Carp;
-use Digest::SHA1;
-use Authen::SASL;
-use MIME::Base64;
 use POSIX;
 use vars qw( $AUTOLOAD $VERSION $PARSING );
 
 $VERSION = "1.02_01";
 
+use XML::Stream;
 use Net::XMPP::Debug;
 use Net::XMPP::JID;
 use Net::XMPP::Namespaces;
