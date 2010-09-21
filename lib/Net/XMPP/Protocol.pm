@@ -1656,7 +1656,7 @@ sub PresenceDBDelete
     my ($jid) = @_;
 
     my $indexJID = $jid;
-    $indexJID = $jid->GetJID() if $jid->isa("Net::XMPP::JID");
+    $indexJID = $jid->GetJID() if (ref $jid && $jid->isa('Net::XMPP::JID'));
 
     return if !exists($self->{PRESENCEDB}->{$indexJID});
     delete($self->{PRESENCEDB}->{$indexJID});
@@ -1695,7 +1695,7 @@ sub PresenceDBQuery
     my ($jid) = @_;
 
     my $indexJID = $jid;
-    $indexJID = $jid->GetJID() if $jid->isa("Net::XMPP::JID");
+    $indexJID = $jid->GetJID() if (ref $jid && $jid->isa('Net::XMPP::JID'));
 
     return if !exists($self->{PRESENCEDB}->{$indexJID});
     return if (scalar(keys(%{$self->{PRESENCEDB}->{$indexJID}->{priorities}})) == 0);
@@ -1719,7 +1719,7 @@ sub PresenceDBResources
     my ($jid) = @_;
 
     my $indexJID = $jid;
-    $indexJID = $jid->GetJID() if $jid->isa("Net::XMPP::JID");
+    $indexJID = $jid->GetJID() if (ref $jid && $jid->isa('Net::XMPP::JID'));
 
     my @resources;
 
@@ -2476,7 +2476,7 @@ sub RosterDBExists
     my $self = shift;
     my ($jid) = @_;
 
-    if ($jid->isa("Net::XMPP::JID"))
+    if (ref $jid && $jid->isa('Net::XMPP::JID'))
     {
         $jid = $jid->GetJID();
     }
@@ -2644,7 +2644,7 @@ sub RosterDBQuery
     my $jid = shift;
     my $key = shift;
 
-    if ($jid->isa("Net::XMPP::JID"))
+    if (ref $jid && $jid->isa('Net::XMPP::JID'))
     {
         $jid = $jid->GetJID();
     }

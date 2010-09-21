@@ -26,7 +26,7 @@ my $Roster = new Net::XMPP::Roster(connection=>$Client);
 ok( defined($Roster), "new()");
 isa_ok($Roster,"Net::XMPP::Roster");
 
-my $jid1 = 'test1@example.com';
+my $jid1 = '1test1@example.com';
 my $res1 = "Work";
 my $res2 = "Home";
 
