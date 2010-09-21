@@ -1,20 +1,21 @@
---- #YAML:1.0
-name: Net-XMPP
-version: 1.02
+---
+abstract: 'XMPP Support Library'
 author:
-  - xmpplar
-abstract: XMPP Support Library
+  - 'Darian Anthony Patrick'
+build_requires:
+  YAML::Tiny: 1.41
+configure_requires:
+  Module::Build: 0.360300
+generated_by: 'Module::Build version 0.3607'
 license: lgpl
-resources:
-  license: |-
-    http://opensource.org/licenses/artistic-license.php
-requires:
-  Digest::SHA1: 1.02
-  XML::Stream: 1.22
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Net-XMPP
 provides:
   Net::XMPP:
     file: lib/Net/XMPP.pm
-    version: 1.02
+    version: 1.02_01
   Net::XMPP::Client:
     file: lib/Net/XMPP/Client.pm
   Net::XMPP::Connection:
@@ -39,8 +40,10 @@ provides:
     file: lib/Net/XMPP/Roster.pm
   Net::XMPP::Stanza:
     file: lib/Net/XMPP/Stanza.pm
-generated_by: Module::Build version 0.2805
-meta-spec:
-  url: |-
-    http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+requires:
+  Authen::SASL: 2.12
+  Digest::SHA1: 1.02
+  XML::Stream: 1.23_02
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+version: 1.02_01

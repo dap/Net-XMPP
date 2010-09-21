@@ -15,7 +15,6 @@ lib/Net/XMPP/PrivacyLists.pm
 lib/Net/XMPP/Protocol.pm
 lib/Net/XMPP/Roster.pm
 lib/Net/XMPP/Stanza.pm
-LICENSE.LGPL
 Makefile.PL
 MANIFEST			This list of files
 META.yml
@@ -43,3 +42,4 @@ t/query_xxxxx.test
 t/rawxml.t
 t/roster.t
 t/srv.t
+LICENSE

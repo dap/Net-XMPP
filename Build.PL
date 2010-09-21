@@ -1,30 +1,39 @@
 use strict;
 use warnings;
+
 use Module::Build;
 
-my $builder = Module::Build->new(
-	module_name       => 'Net::XMPP',
-	license           => 'lgpl',
-	dist_author       => 'Darian Anthony Patrick',
-	dist_abstract     => 'XMPP Support Library',
-	dist_version_from => 'lib/Net/XMPP.pm',
+my $build = Module::Build->new(
+	module_name   => 'Net::XMPP',
+	license       => 'lgpl',
+	dist_author   => 'Darian Anthony Patrick <dapatrick@cpan.org>',
+	dist_abstract => 'XMPP Support Library',
 
 	configure_requires => {
 		'Module::Build' => '0.360300',
 	},
 
 	build_requires => {
+		'Test::More'    => '0.92',
 		'YAML::Tiny'    => '1.41',
 	},
 
 	requires => {
-		'Authen::SASL'  => '2.12',
-		'XML::Stream'   => '1.23_02',
-		'Digest::SHA1'  => '1.02',
+		'perl'         => 'v5.8.0',
+		'Authen::SASL' => '2.12',
+		'Digest::SHA1' => '1.02',
+		'XML::Stream'  => '1.23_02',
 	},
 
-	create_license => 1,
-	create_makefile_pl => 'passthrough',
+	sign               => 1
+	create_license     => 1,
+	create_makefile_pl => 'small',
+	meta_merge => {
+		'resources' => {
+			'bugtracker' => 'https://rt.cpan.org/Dist/Display.html?Queue=Net-XMPP',
+			'repository' => 'http://github.com/dap/Net-XMPP',
+		}
+	},
 );
 
-$builder->create_build_script();
+$build->create_build_script();
