@@ -24,9 +24,11 @@ stderr
 t/1_load.t
 t/2_client_jabberd1.4.t
 t/3_client_jabberd2.t
+t/config/accounts.yml.copyme
 t/get_time_stamp.test
 t/iq.t
 t/jid.t
+t/lib/Net/XMPP/Test/Utils.pm
 t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
@@ -40,3 +42,4 @@ t/presence.t
 t/query_xxxxx.test
 t/rawxml.t
 t/roster.t
+t/srv.t

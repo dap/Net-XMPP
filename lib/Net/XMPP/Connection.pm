@@ -144,7 +144,10 @@ sub Connect
                     namespace      => $self->{SERVER}->{namespace},
                     connectiontype => $self->{SERVER}->{connectiontype},
                     timeout        => $self->{SERVER}->{timeout},
+                    ssl_ca_path    => $self->{SERVER}->{ssl_ca_path},
+                    ssl_verify     => $self->{SERVER}->{ssl_verify},
                     ssl            => $self->{SERVER}->{ssl}, #LEGACY
+                    _tls           => $self->{SERVER}->{tls}, #LEGACY
                     (defined($self->{SERVER}->{componentname}) ?
                      (to => $self->{SERVER}->{componentname}) :
                      ()
