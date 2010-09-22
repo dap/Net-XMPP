@@ -1,3 +1,17 @@
+1.02_01 2010-09-22
+===
+  - New maintainer: DAPATRICK
+  - RT#15736 Replace print statements to debug logging 
+  - RT#51156 Correct typo in documentation
+  - RT#54521 Note dependency on XML::Stream 1.23
+  - RT#37129, RT#18539 Support for virtual domains 
+  - RT#57887 Use each required module explicitly
+  - RT#61453 Pass ssl_verify and ssl_ca_path
+  - RT#61453 Improve undef/null ssl param handling 
+  - RT#61144 Appropriately handle non-object jid 
+  - RT#37030 Clarify license as LGPL 2.1 
+  - RT#58333 Check definedness of hash key before use 
+
 1.0.2 $Id: CHANGES 28 2007-03-29 12:39:48Z hacker $
 ===
   - Fix bug in Stanza::_xpath_defined causing defined to pass when it shouldn't
