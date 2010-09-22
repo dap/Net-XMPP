@@ -1,4 +1,4 @@
-Net::XMPP v1.0
+Net::XMPP
 
 The Extensible Messaging and Presence Protocol (XMPP) is an IETF standard
 that provides a complete cross protocol messaging solution.  The problem
@@ -12,29 +12,5 @@ access to the XMPP protocol.  Using OOP modules we provide a clean
 interface to writing anything from a full client to a simple protocol
 tester.
 
-
-Ryan Eatmon
-reatmon@jabber.org
-
-
-REQUIREMENTS
-  - XML::Stream     - Handles the connection between the Client and the Server.
-  - Digest::SHA1    - Encrypted authorization so that your password is not sent
-                      over unsecure XML.
-
-INSTALLATION
-
-  perl Makefile.PL
-  make
-  make install
-
-STATUS
-
-  Beta.  There is some more testing and features to add before I'm ready to
-call this 1.0.  It should be usable, but I would not put any production code
-using this yet.  If you run into problems, downgrade to Net::Jabber 1.29.
-
-Please send any bug reports to reatmon@jabber.org.
-
-2004/08/22
+Please report bugs at https://rt.cpan.org/Public/Bug/Report.html?Queue=Net-XMPP.
 

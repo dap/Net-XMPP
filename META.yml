@@ -1,8 +1,10 @@
 ---
 abstract: 'XMPP Support Library'
 author:
-  - 'Darian Anthony Patrick'
+  - 'Darian Anthony Patrick <dapatrick@cpan.org>'
 build_requires:
+  LWP::Online: 1.07
+  Test::More: 0.92
   YAML::Tiny: 1.41
 configure_requires:
   Module::Build: 0.360300
@@ -44,6 +46,9 @@ requires:
   Authen::SASL: 2.12
   Digest::SHA1: 1.02
   XML::Stream: 1.23_02
+  perl: v5.8.0
 resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Queue=Net-XMPP
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+  repository: http://github.com/dap/Net-XMPP
 version: 1.02_01
