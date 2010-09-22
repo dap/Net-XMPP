@@ -14,6 +14,7 @@ my $build = Module::Build->new(
 	},
 
 	build_requires => {
+		'LWP::Online'   => '1.07',
 		'Test::More'    => '0.92',
 		'YAML::Tiny'    => '1.41',
 	},
