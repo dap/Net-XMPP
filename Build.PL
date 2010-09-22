@@ -25,7 +25,7 @@ my $build = Module::Build->new(
 		'XML::Stream'  => '1.23_02',
 	},
 
-	sign               => 1
+	sign               => 1,
 	create_license     => 1,
 	create_makefile_pl => 'small',
 	meta_merge => {
