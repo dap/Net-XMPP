@@ -23,7 +23,7 @@ my $build = Module::Build->new(
 		'perl'         => 'v5.8.0',
 		'Authen::SASL' => '2.12',
 		'Digest::SHA1' => '1.02',
-		'XML::Stream'  => '1.23_02',
+		'XML::Stream'  => '1.23_04',
 	},
 
 	sign               => 1,
