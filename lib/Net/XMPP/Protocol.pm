@@ -3245,7 +3245,7 @@ sub callbackIQ
     $self->{DEBUG}->Log1("callbackIQ: type($type) ns($ns)");
 
     if (exists($self->{CB}->{IQns}->{$ns})
-        && (ref($self->{CB}->{IQns}->{$ns}) != 'HASH' )
+        && (ref($self->{CB}->{IQns}->{$ns}) eq 'HASH' )
         )
     {
         $self->{DEBUG}->Log1("callbackIQ: goto user function( $self->{CB}->{IQns}->{$ns} )");
