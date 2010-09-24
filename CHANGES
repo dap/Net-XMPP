@@ -1,3 +1,7 @@
+1.02_02 2010-09-24
+===
+  - Increase XML::Stream dependency to 1.23_04
+
 1.02_01 2010-09-22
 ===
   - New maintainer: DAPATRICK
