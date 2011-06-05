@@ -1,6 +1,8 @@
 Build
-_build/
-blib/
+_build
+blib
 MYMETA.yml
+MYMETA.json
 t/config/accounts.yml
 *.bak
+Makefile
