@@ -40,9 +40,9 @@ Net::XMPP::Roster - XMPP Roster Object
 
 =head2 Basic Functions
 
-  my $Client = new Net::XMPP::Client(...);
+  my $Client = Net::XMPP::Client->new(...);
 
-  my $Roster = new Net::XMPP::Roster(connection=>$Client);
+  my $Roster = Net::XMPP::Roster->new(connection=>$Client);
     or
   my $Roster = $Client->Roster();
 
@@ -537,7 +537,7 @@ sub jids
                      exists($self->{JIDS}->{$jid}->{groups}) &&
                      ($#{$self->{JIDS}->{$jid}->{groups}} > -1));
 
-            push(@jids,new Net::XMPP::JID($jid));
+            push(@jids, Net::XMPP::JID->new($jid));
         }
     }
 
@@ -548,7 +548,7 @@ sub jids
         {
             foreach my $jid (keys(%{$self->{GROUPS}->{$group}}))
             {
-                push(@jids,new Net::XMPP::JID($jid));
+                push(@jids, Net::XMPP::JID->new($jid));
             }
         }
     }
