@@ -6,3 +6,4 @@ MYMETA.json
 t/config/accounts.yml
 *.bak
 Makefile
+*.swp
