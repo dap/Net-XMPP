@@ -71,45 +71,64 @@ Net::XMPP::Client - XMPP Client Module
 
 =head1 METHODS
 
-=head2 Basic Functions
+=head1 Basic Functions
 
-    new(debuglevel=>0|1|2, - creates the Client object.  debugfile
-        debugfile=>string,   should be set to the path for the debug
-        debugtime=>0|1)      log to be written.  If set to "stdout"
-                             then the debug will go there.  debuglevel
-                             controls the amount of debug.  For more
-                             information about the valid setting for
-                             debuglevel, debugfile, and debugtime see
-                             Net::XMPP::Debug.
+=head2 new
 
-    Connect(hostname=>string,      - opens a connection to the server
-            port=>integer,           listed in the hostname (default
-            timeout=>int             localhost), on the port (default
-            connectiontype=>string,  5222) listed, using the
-            tls=>0|1,                connectiontype listed (default
-            srv=>0|1,                tcpip).  The two connection types
-            componentname=>string)   available are:
-                                       tcpip  standard TCP socket
-                                       http   TCP socket, but with the
-                                              headers needed to talk
-                                              through a web proxy
-                                     If you specify tls, then it TLS
-                                     will be used if it is available
-                                     as a feature.
+    new(debuglevel=>0|1|2,
+        debugfile=>string,
+        debugtime=>0|1)
 
-                                     If srv is specified AND Net::DNS is
-                                     installed and can be loaded, then
-                                     an SRV query is sent to srv.hostname
-                                     and the results processed to replace
-                                     the hostname and port.  If the lookup
-                                     fails, or Net::DNS cannot be loaded,
-                                     then hostname and port are left alone
-                                     as the defaults.
+creates the Client object.  debugfile
+should be set to the path for the debug
+log to be written.  If set to "stdout"
+then the debug will go there.  debuglevel
+controls the amount of debug.  For more
+information about the valid setting for
+debuglevel, debugfile, and debugtime see
+Net::XMPP::Debug.
+
+=head2 Connect
+
+    Connect(hostname=>string,
+            port=>integer,
+            timeout=>int,
+            connectiontype=>string,
+            tls=>0|1,
+            srv=>0|1,
+            componentname=>string)
+
+opens a connection to the server
+listed in the hostname (default
+localhost), on the port (default
+5222) listed, using the
+connectiontype listed (default
+tcpip).  The two connection types
+available are:
+
+  tcpip  standard TCP socket
+  http   TCP socket, but with the
+         headers needed to talk
+         through a web proxy
+
+If you specify tls, then it TLS
+will be used if it is available
+as a feature.
+
+If srv is specified AND Net::DNS is
+installed and can be loaded, then
+an SRV query is sent to srv.hostname
+and the results processed to replace
+the hostname and port.  If the lookup
+fails, or Net::DNS cannot be loaded,
+then hostname and port are left alone
+as the defaults.
+
                                      
-                                     Alternatively, you may manually specify
-                                     componentname as the domain portion of the
-                                     jid and leave hostname set to the actual
-                                     hostname of the XMPP server.
+Alternatively, you may manually specify
+componentname as the domain portion of the
+jid and leave hostname set to the actual
+hostname of the XMPP server.
 
     Execute(hostname=>string,       - Generic inner loop to handle
             port=>int,                connecting to the server, calling
