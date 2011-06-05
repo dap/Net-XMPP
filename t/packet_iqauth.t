@@ -5,13 +5,13 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $debug = new Net::XMPP::Debug(setdefault=>1,
+my $debug = Net::XMPP::Debug->new(setdefault=>1,
                                  level=>-1,
                                  file=>"stdout",
                                  header=>"test",
                                 );
 
-my $query = new Net::XMPP::Stanza("query");
+my $query = Net::XMPP::Stanza->new("query");
 ok( defined($query), "new()" );
 isa_ok( $query, "Net::XMPP::Stanza" );
 
@@ -27,7 +27,7 @@ testScalar($query,"Username","username");
 
 is( $query->GetXML(), "<query xmlns='jabber:iq:auth'><digest>digest</digest><hash>hash</hash><password>password</password><resource>resource</resource><sequence>sequence</sequence><token>token</token><username>username</username></query>", "GetXML()" );
 
-my $query2 = new Net::XMPP::Stanza("query");
+my $query2 = Net::XMPP::Stanza->new("query");
 ok( defined($query2), "new()" );
 isa_ok( $query2, "Net::XMPP::Stanza" );
 

@@ -5,13 +5,13 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $debug = new Net::XMPP::Debug(setdefault=>1,
+my $debug = Net::XMPP::Debug->new(setdefault=>1,
                                  level=>-1,
                                  file=>"stdout",
                                  header=>"test",
                                 );
 
-my $query = new Net::XMPP::Stanza("query");
+my $query = Net::XMPP::Stanza->new("query");
 ok( defined($query), "new()" );
 isa_ok( $query, "Net::XMPP::Stanza" );
 

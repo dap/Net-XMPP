@@ -5,7 +5,7 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $message = new Net::XMPP::Message();
+my $message = Net::XMPP::Message->new();
 ok( defined($message), "new()");
 isa_ok( $message, "Net::XMPP::Message");
 
@@ -28,7 +28,7 @@ $message->InsertRawXML("<bar>foo</bar>");
 is( $message->GetXML(), "<message from='user1\@server1/resource1' to='user2\@server2/resource2'><body>body</body><subject>subject</subject><bar>foo</bar></message>", "GetXML()" );
 
 
-my $iq = new Net::XMPP::IQ();
+my $iq = Net::XMPP::IQ->new();
 ok( defined($iq), "new()");
 isa_ok( $iq, "Net::XMPP::IQ");
 
