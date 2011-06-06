@@ -5,7 +5,7 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $debug = new Net::XMPP::Debug(setdefault=>1,
+my $debug = Net::XMPP::Debug->new(setdefault=>1,
                                  level=>-1,
                                  file=>"stdout",
                                  header=>"test",
@@ -14,7 +14,7 @@ my $debug = new Net::XMPP::Debug(setdefault=>1,
 #------------------------------------------------------------------------------
 # presence
 #------------------------------------------------------------------------------
-my $presence = new Net::XMPP::Presence();
+my $presence = Net::XMPP::Presence->new();
 ok( defined($presence), "new()");
 isa_ok( $presence, "Net::XMPP::Presence");
 
@@ -77,7 +77,7 @@ ok( !$presence->DefinedChild("foo:bar"), "DefinedChild - foo:bar - no");
 #------------------------------------------------------------------------------
 # presence
 #------------------------------------------------------------------------------
-my $presence2 = new Net::XMPP::Presence();
+my $presence2 = Net::XMPP::Presence->new();
 ok( defined($presence2), "new()");
 isa_ok( $presence2, "Net::XMPP::Presence");
 

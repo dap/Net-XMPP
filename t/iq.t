@@ -5,7 +5,7 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $debug = new Net::XMPP::Debug(setdefault=>1,
+my $debug = Net::XMPP::Debug->new(setdefault=>1,
                                  level=>-1,
                                  file=>"stdout",
                                  header=>"test",
@@ -14,7 +14,7 @@ my $debug = new Net::XMPP::Debug(setdefault=>1,
 #------------------------------------------------------------------------------
 # iq
 #------------------------------------------------------------------------------
-my $iq = new Net::XMPP::IQ();
+my $iq = Net::XMPP::IQ->new();
 ok( defined($iq), "new()");
 isa_ok( $iq, "Net::XMPP::IQ");
 
@@ -85,7 +85,7 @@ is($child, $xoob, "Is the query xoob?");
 #------------------------------------------------------------------------------
 # iq
 #------------------------------------------------------------------------------
-my $iq2 = new Net::XMPP::IQ();
+my $iq2 = Net::XMPP::IQ->new();
 ok( defined($iq2), "new()");
 isa_ok( $iq2, "Net::XMPP::IQ");
 

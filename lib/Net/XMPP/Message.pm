@@ -54,7 +54,7 @@ Net::XMPP::Message - XMPP Message Module
 
     use Net::XMPP;
 
-    $Mess = new Net::XMPP::Message();
+    $Mess = Net::XMPP::Message->new();
 
   Now you can call the creation functions below to populate the tag
   before sending it.
@@ -318,7 +318,7 @@ sub new
     return $self;
 }
 
-sub _message { my $self = shift; return new Net::XMPP::Message(); }
+sub _message { my $self = shift; return Net::XMPP::Message->new(); }
 
 # Copied from Net::Jabber::Message because GetTimeStamp doesn't work without DefinedX
 sub GetX     { my $self = shift; $self->GetChild(@_);    }

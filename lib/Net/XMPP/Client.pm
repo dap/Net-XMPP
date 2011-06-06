@@ -53,7 +53,7 @@ Net::XMPP::Client - XMPP Client Module
 
     use Net::XMPP;
 
-    $Con = new Net::XMPP::Client();
+    $Con = Net::XMPP::Client->new();
 
     $Con->SetCallbacks(...);
 
@@ -71,114 +71,167 @@ Net::XMPP::Client - XMPP Client Module
 
 =head1 METHODS
 
-=head2 Basic Functions
+=head1 Basic Functions
 
-    new(debuglevel=>0|1|2, - creates the Client object.  debugfile
-        debugfile=>string,   should be set to the path for the debug
-        debugtime=>0|1)      log to be written.  If set to "stdout"
-                             then the debug will go there.  debuglevel
-                             controls the amount of debug.  For more
-                             information about the valid setting for
-                             debuglevel, debugfile, and debugtime see
-                             Net::XMPP::Debug.
+=head2 new
 
-    Connect(hostname=>string,      - opens a connection to the server
-            port=>integer,           listed in the hostname (default
-            timeout=>int             localhost), on the port (default
-            connectiontype=>string,  5222) listed, using the
-            tls=>0|1,                connectiontype listed (default
-            srv=>0|1,                tcpip).  The two connection types
-            componentname=>string)   available are:
-                                       tcpip  standard TCP socket
-                                       http   TCP socket, but with the
-                                              headers needed to talk
-                                              through a web proxy
-                                     If you specify tls, then it TLS
-                                     will be used if it is available
-                                     as a feature.
+    new(debuglevel=>0|1|2,
+        debugfile=>string,
+        debugtime=>0|1)
 
-                                     If srv is specified AND Net::DNS is
-                                     installed and can be loaded, then
-                                     an SRV query is sent to srv.hostname
-                                     and the results processed to replace
-                                     the hostname and port.  If the lookup
-                                     fails, or Net::DNS cannot be loaded,
-                                     then hostname and port are left alone
-                                     as the defaults.
+creates the Client object.  debugfile
+should be set to the path for the debug
+log to be written.  If set to "stdout"
+then the debug will go there.  debuglevel
+controls the amount of debug.  For more
+information about the valid setting for
+debuglevel, debugfile, and debugtime see
+Net::XMPP::Debug.
+
+=head2 Connect
+
+    Connect(hostname=>string,
+            port=>integer,
+            timeout=>int,
+            connectiontype=>string,
+            tls=>0|1,
+            srv=>0|1,
+            componentname=>string)
+
+opens a connection to the server
+listed in the hostname (default
+localhost), on the port (default
+5222) listed, using the
+connectiontype listed (default
+tcpip).  The two connection types
+available are:
+
+  tcpip  standard TCP socket
+  http   TCP socket, but with the
+         headers needed to talk
+         through a web proxy
+
+If you specify tls, then it TLS
+will be used if it is available
+as a feature.
+
+If srv is specified AND Net::DNS is
+installed and can be loaded, then
+an SRV query is sent to srv.hostname
+and the results processed to replace
+the hostname and port.  If the lookup
+fails, or Net::DNS cannot be loaded,
+then hostname and port are left alone
+as the defaults.
+
                                      
-                                     Alternatively, you may manually specify
-                                     componentname as the domain portion of the
-                                     jid and leave hostname set to the actual
-                                     hostname of the XMPP server.
+Alternatively, you may manually specify
+componentname as the domain portion of the
+jid and leave hostname set to the actual
+hostname of the XMPP server.
 
-    Execute(hostname=>string,       - Generic inner loop to handle
-            port=>int,                connecting to the server, calling
-            tls=>0|1,                 Process, and reconnecting if the
-            username=>string,         connection is lost.  There are
-            password=>string,         five callbacks available that are
-            resource=>string,         called at various places:
-            register=>0|1,              onconnect - when the client has
-            connectiontype=>string,                 made a connection.
-            connecttimeout=>string,     onauth - when the connection is
-            connectattempts=>int,                made and user has been
-            connectsleep=>int,                   authed.  Essentially,
-            processtimeout=>int)                 this is when you can
-                                                 start doing things
-                                                 as a Client.  Like
-                                                 send presence, get your
-                                                 roster, etc...
-                                        onprocess - this is the most
-                                                    inner loop and so
-                                                    gets called the most.
-                                                    Be very very careful
-                                                    what you put here
-                                                    since it can
-                                                    *DRASTICALLY* affect
-                                                    performance.
-                                        ondisconnect - when the client
-                                                       disconnects from
-                                                       the server.
-                                        onexit - when the function gives
-                                                 up trying to connect and
-                                                 exits.
-                                      The arguments are passed straight
-                                      on to the Connect function, except
-                                      for connectattempts and connectsleep.
-                                      connectattempts is the number of
-                                      times that the Component should try
-                                      to connect before giving up.  -1
-                                      means try forever.  The default is
-                                      -1. connectsleep is the number of
-                                      seconds to sleep between each
-                                      connection attempt.
+=head2 Execute
 
-                                      If you specify register=>1, then the
-                                      Client will attempt to register the
-                                      sepecified account for you, if it
-                                      does not exist.
+    Execute(hostname=>string,       
+            port=>int,              
+            tls=>0|1,               
+            username=>string,       
+            password=>string,       
+            resource=>string,       
+            register=>0|1,          
+            connectiontype=>string, 
+            connecttimeout=>string, 
+            connectattempts=>int,   
+            connectsleep=>int,      
+            processtimeout=>int)    
 
-    Process(integer) - takes the timeout period as an argument.  If no
-                       timeout is listed then the function blocks until
-                       a packet is received.  Otherwise it waits that
-                       number of seconds and then exits so your program
-                       can continue doing useful things.  NOTE: This is
-                       important for GUIs.  You need to leave time to
-                       process GUI commands even if you are waiting for
-                       packets.  The following are the possible return
-                       values, and what they mean:
 
-                           1   - Status ok, data received.
-                           0   - Status ok, no data received.
-                         undef - Status not ok, stop processing.
+Generic inner loop to handle
+connecting to the server, calling
+Process, and reconnecting if the
+connection is lost.  There are
+five callbacks available that are
+called at various places:
 
-                       IMPORTANT: You need to check the output of every
-                       Process.  If you get an undef then the connection
-                       died and you should behave accordingly.
+ onconnect - when the client has
+             made a connection.
 
-    Disconnect() - closes the connection to the server.
+ onauth - when the connection is
+          made and user has been
+          authed.  Essentially,
+          this is when you can
+        start doing things
+        as a Client.  Like
+        send presence, get your
+        roster, etc...
 
-    Connected() - returns 1 if the Transport is connected to the server,
-                  and 0 if not.
+  onprocess - this is the most
+              inner loop and so
+              gets called the most.
+              Be very very careful
+              what you put here
+              since it can
+              *DRASTICALLY* affect
+              performance.
+
+  ondisconnect - when the client
+                 disconnects from
+                 the server.
+
+  onexit - when the function gives
+           up trying to connect and
+           exits.
+
+The arguments are passed straight
+on to the Connect function, except
+for connectattempts and connectsleep.
+connectattempts is the number of
+times that the Component should try
+to connect before giving up.  -1
+means try forever.  The default is
+-1. connectsleep is the number of
+seconds to sleep between each
+connection attempt.
+
+If you specify register=>1, then the
+Client will attempt to register the
+sepecified account for you, if it
+does not exist.
+
+=head2 Process
+
+    Process(integer)
+
+takes the timeout period as an argument.  If no
+timeout is listed then the function blocks until
+a packet is received.  Otherwise it waits that
+number of seconds and then exits so your program
+can continue doing useful things.  NOTE: This is
+important for GUIs.  You need to leave time to
+process GUI commands even if you are waiting for
+packets.  The following are the possible return
+values, and what they mean:
+
+    1   - Status ok, data received.
+    0   - Status ok, no data received.
+  undef - Status not ok, stop processing.
+
+IMPORTANT: You need to check the output of every
+Process.  If you get an undef then the connection
+died and you should behave accordingly.
+
+=head2 Disconnect
+
+    Disconnect()
+
+closes the connection to the server.
+
+=head2 Connected
+
+    Connected()
+
+returns 1 if the Transport is connected to the server,
+and 0 if not.
 
 =head1 AUTHOR
 

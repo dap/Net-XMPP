@@ -38,7 +38,7 @@ Net::XMPP::Debug - XMPP Debug Module
 
 =head2 Basic Functions
 
-    $Debug = new Net::XMPP::Debug();
+    $Debug = Net::XMPP::Debug->new();
 
     $Debug->Init(level=>2,
 	             file=>"stdout",
@@ -85,7 +85,7 @@ Net::XMPP::Debug - XMPP Debug Module
 
 =head1 EXAMPLE
 
-  $Debug = new Net::XMPP:Debug(level=>2,
+  $Debug = Net::XMPP:Debug->new(level=>2,
                                header=>"Example");
 
     $Debug->Log0("test");
@@ -173,7 +173,7 @@ sub Init
         $self->{LEVEL} = 0;
         $self->{LEVEL} = $args{level} if exists($args{level});
 
-        $self->{HANDLE} = new FileHandle(">&STDERR");
+        $self->{HANDLE} = FileHandle->new(">&STDERR");
         $self->{HANDLE}->autoflush(1);
         if (exists($args{file}))
         {
@@ -188,7 +188,7 @@ sub Init
                 {
                     if (-w $args{file})
                     {
-                        $self->{HANDLE} = new FileHandle(">$args{file}");
+                        $self->{HANDLE} = FileHandle->new(">$args{file}");
                         if (defined($self->{HANDLE}))
                         {
                             $self->{HANDLE}->autoflush(1);
@@ -211,7 +211,7 @@ sub Init
                 }
                 else
                 {
-                    $self->{HANDLE} = new FileHandle(">$args{file}");
+                    $self->{HANDLE} = FileHandle->new(">$args{file}");
                     if (defined($self->{HANDLE}))
                     {
                         $self->{HANDLE}->autoflush(1);

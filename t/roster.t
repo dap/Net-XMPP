@@ -5,7 +5,7 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $debug = new Net::XMPP::Debug(setdefault=>1,
+my $debug = Net::XMPP::Debug->new(setdefault=>1,
                                  level=>-1,
                                  file=>"stdout",
                                  header=>"test",
@@ -14,7 +14,7 @@ my $debug = new Net::XMPP::Debug(setdefault=>1,
 #------------------------------------------------------------------------------
 # Client
 #------------------------------------------------------------------------------
-my $Client = new Net::XMPP::Client();
+my $Client = Net::XMPP::Client->new();
 ok( defined($Client), "new()");
 isa_ok($Client,"Net::XMPP::Client");
 isa_ok($Client,"Net::XMPP::Connection");
@@ -22,7 +22,7 @@ isa_ok($Client,"Net::XMPP::Connection");
 #------------------------------------------------------------------------------
 # Roster
 #------------------------------------------------------------------------------
-my $Roster = new Net::XMPP::Roster(connection=>$Client);
+my $Roster = Net::XMPP::Roster->new(connection=>$Client);
 ok( defined($Roster), "new()");
 isa_ok($Roster,"Net::XMPP::Roster");
 
