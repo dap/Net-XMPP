@@ -5,7 +5,7 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $jid = new Net::XMPP::JID('host.com/xxx@yyy.com/zzz');
+my $jid = Net::XMPP::JID->new('host.com/xxx@yyy.com/zzz');
 ok( defined($jid), "new()" );
 isa_ok( $jid, "Net::XMPP::JID" );
 is( $jid->GetUserID(), '', "GetUserID()" );
@@ -14,7 +14,7 @@ is( $jid->GetResource(), 'xxx@yyy.com/zzz', "GetResource()" );
 is( $jid->GetJID("full"), 'host.com/xxx@yyy.com/zzz', "GetJID(\"full\")" );
 is( $jid->GetJID("base"), 'host.com', "GetJID(\"base\")" );
 
-my $jid2 = new Net::XMPP::JID('user@host.com/xxx@yyy.com/zzz');
+my $jid2 = Net::XMPP::JID->new('user@host.com/xxx@yyy.com/zzz');
 ok( defined($jid2), "new()" );
 isa_ok( $jid2, "Net::XMPP::JID" );
 is( $jid2->GetUserID(), 'user', "GetUserID()" );

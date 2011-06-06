@@ -25,7 +25,7 @@ SKIP:
     skip "Cannot open connection (maybe a firewall?)",4 unless defined($sock);
     $sock->close();
     
-    $Client = new Net::XMPP::Client();
+    $Client = Net::XMPP::Client->new();
 
     $Client->SetCallBacks(onconnect => \&onConnect,
                           onauth    => \&onAuth,

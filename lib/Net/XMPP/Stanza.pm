@@ -222,8 +222,8 @@ use Net::XMPP::Debug;
 use Net::XMPP::Namespaces;
 use vars qw( $AUTOLOAD %FUNCTIONS $DEBUG );
 
-$DEBUG = new Net::XMPP::Debug(usedefault=>1,
-                              header=>"XMPP");
+$DEBUG = Net::XMPP::Debug->new(usedefault=>1,
+                          header=>"XMPP");
 
 # XXX need to look at evals and $@
 
@@ -263,7 +263,7 @@ sub _init
         elsif (ref($_[0]) eq "")
         {
             $self->{TAG} = shift;
-            $self->{TREE} = new XML::Stream::Node($self->{TAG});
+            $self->{TREE} = XML::Stream::Node->new($self->{TAG});
         }
         else
         {
@@ -275,7 +275,7 @@ sub _init
     }
     else
     {
-        $self->{TREE} = new XML::Stream::Node($self->{TAG});
+        $self->{TREE} = XML::Stream::Node->new($self->{TAG});
     }
 
     return;
@@ -395,7 +395,7 @@ sub NewChild
             if exists($Net::XMPP::Namespaces::NS{$xmlns});
     }
 
-    my $node = new XML::Stream::Node($tag);
+    my $node = XML::Stream::Node->new($tag);
     $node->put_attrib(xmlns=>$xmlns);
 
     return $self->AddChild($node);
@@ -461,7 +461,7 @@ sub NewFirstChild
             if exists($Net::XMPP::Namespaces::NS{$xmlns});
     }
 
-    my $node = new XML::Stream::Node($tag);
+    my $node = XML::Stream::Node->new($tag);
     $node->put_attrib(xmlns=>$xmlns);
 
     return $self->AddFirstChild($node);
@@ -1220,7 +1220,7 @@ sub _xpath_add
         }
     }
 
-    my $node = new XML::Stream::Node($tag);
+    my $node = XML::Stream::Node->new($tag);
     $node->put_attrib(xmlns=>$xmlns);
 
     my $obj = $self->AddChild($node);
@@ -1429,7 +1429,7 @@ sub _missing_function
 sub _new_jid
 {
     my $self = shift;
-    return new Net::XMPP::JID(@_);
+    return Net::XMPP::JID->new(@_);
 }
 
 
@@ -1441,7 +1441,7 @@ sub _new_jid
 sub _new_packet
 {
     my $self = shift;
-    return new Net::XMPP::Stanza(@_);
+    return Net::XMPP::Stanza->new(@_);
 }
 
 

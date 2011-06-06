@@ -5,7 +5,7 @@ BEGIN{ use_ok( "Net::XMPP" ); }
 
 require "t/mytestlib.pl";
 
-my $debug = new Net::XMPP::Debug(setdefault=>1,
+my $debug = Net::XMPP::Debug->new(setdefault=>1,
                                  level=>-1,
                                  file=>"stdout",
                                  header=>"test",
@@ -14,7 +14,7 @@ my $debug = new Net::XMPP::Debug(setdefault=>1,
 #------------------------------------------------------------------------------
 # message
 #------------------------------------------------------------------------------
-my $message = new Net::XMPP::Message();
+my $message = Net::XMPP::Message->new();
 ok( defined($message), "new()");
 isa_ok( $message, "Net::XMPP::Message");
 
@@ -77,7 +77,7 @@ ok( !$message->DefinedChild("foo:bar"), "DefinedChild - foo:bar - no");
 #------------------------------------------------------------------------------
 # message
 #------------------------------------------------------------------------------
-my $message2 = new Net::XMPP::Message();
+my $message2 = Net::XMPP::Message->new();
 ok( defined($message2), "new()");
 isa_ok( $message2, "Net::XMPP::Message");
 

@@ -73,7 +73,7 @@ Net::XMPP::Protocol - XMPP Protocol Module
 =head2 Basic Functions
 
     use Net::XMPP qw( Client );
-    $Con = new Net::XMPP::Client();                  # From
+    $Con = Net::XMPP::Client->new();                  # From
     $status = $Con->Connect(hostname=>"jabber.org"); # Net::XMPP::Client
 
     $Con->SetCallBacks(send=>\&sendCallBack,
@@ -805,10 +805,10 @@ $NEWOBJECT{'presence'} = "Net::XMPP::Presence";
 $NEWOBJECT{'jid'}      = "Net::XMPP::JID";
 ##############################################################################
 
-sub _message  { shift; my $o; eval "\$o = new $NEWOBJECT{'message'}(\@_);"; return $o;  }
-sub _presence { shift; my $o; eval "\$o = new $NEWOBJECT{'presence'}(\@_);"; return $o; }
-sub _iq       { shift; my $o; eval "\$o = new $NEWOBJECT{'iq'}(\@_);"; return $o;       }
-sub _jid      { shift; my $o; eval "\$o = new $NEWOBJECT{'jid'}(\@_);"; return $o;      }
+sub _message  { shift; my $o; eval "\$o = $NEWOBJECT{'message'}->new(\@_);"; return $o;  }
+sub _presence { shift; my $o; eval "\$o = $NEWOBJECT{'presence'}->new(\@_);"; return $o; }
+sub _iq       { shift; my $o; eval "\$o = $NEWOBJECT{'iq'}->new(\@_);"; return $o;       }
+sub _jid      { shift; my $o; eval "\$o = $NEWOBJECT{'jid'}->new(\@_);"; return $o;      }
 
 ###############################################################################
 #+-----------------------------------------------------------------------------
@@ -1016,7 +1016,7 @@ sub BuildObject
     if (exists($NEWOBJECT{$tag}))
     {
         $self->{DEBUG}->Log1("BuildObject: tag($tag) package($NEWOBJECT{$tag})");
-        eval "\$obj = new $NEWOBJECT{$tag}(\$tree);";
+        eval "\$obj = $NEWOBJECT{$tag}->new(\$tree);";
     }
 
     return $obj;
@@ -2092,7 +2092,7 @@ sub PrivacyLists
 {
     my $self = shift;
 
-    return new Net::XMPP::PrivacyLists(connection=>$self);
+    return Net::XMPP::PrivacyLists->new(connection=>$self);
 }
 
 
@@ -2415,7 +2415,7 @@ sub Roster
 {
     my $self = shift;
 
-    return new Net::XMPP::Roster(connection=>$self);
+    return Net::XMPP::Roster->new(connection=>$self);
 }
 
 
@@ -2971,7 +2971,7 @@ sub SASLClient
 
     return unless defined($mechanisms);
 
-    my $sasl = new Authen::SASL(mechanism=>join(" ",@{$mechanisms}),
+    my $sasl = Authen::SASL->new(mechanism=>join(" ",@{$mechanisms}),
                                 callback=>{ user => $username,
                                             pass => $password
                                           }
