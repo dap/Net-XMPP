@@ -27,16 +27,16 @@ Net::XMPP::JID - XMPP JID Module
 
 =head1 SYNOPSIS
 
-  Net::XMPP::JID is a companion to the Net::XMPP module.
-  It provides the user a simple interface to set and retrieve all
-  parts of a Jabber ID (userid on a server).
+Net::XMPP::JID is a companion to the Net::XMPP module.
+It provides the user a simple interface to set and retrieve all
+parts of a Jabber ID (userid on a server).
 
 =head1 DESCRIPTION
 
-  To initialize the JID you must pass it the string that represents the
-  jid from the XML packet.  Inside the XMPP modules this is done
-  automatically and the JID object is returned instead of a string.
-  For example, in the callback function for the XMPP object foo:
+To initialize the JID you must pass it the string that represents the
+jid from the XML packet.  Inside the XMPP modules this is done
+automatically and the JID object is returned instead of a string.
+For example, in the callback function for the XMPP object foo:
 
     use Net::XMPP;
 
@@ -49,16 +49,16 @@ Net::XMPP::JID - XMPP JID Module
       .
     }
 
-  You now have access to all of the retrieval functions available.
+You now have access to all of the retrieval functions available.
 
-  To create a new JID to send to the server:
+To create a new JID to send to the server:
 
     use Net::XMPP;
 
     $JID = Net::XMPP::JID->new();
 
-  Now you can call the creation functions below to populate the tag
-  before sending it.
+Now you can call the creation functions below to populate the tag
+before sending it.
 
 =head2 Retrieval functions
 
@@ -86,46 +86,90 @@ Net::XMPP::JID - XMPP JID Module
 
 =head2 Retrieval functions
 
-  GetUserID() - returns a string with the userid of the JID.
-                If the string is an address (bob%jabber.org) then
-                the function will return it as an address
-                (bob@jabber.org).
+=over 4
 
-  GetServer() - returns a string with the server of the JID.
+=item GetUserID
 
-  GetResource() - returns a string with the resource of the JID.
+  GetUserID()
 
-  GetJID()       - returns a string that represents the JID stored
-  GetJID("full")   within.  If the "full" string is specified, then
-  GetJID("base")   you get the full JID, including Resource, which
-                   should be used to send to the server.  If the "base",
-                   string is specified, then you will just get
-                   user@server, or the base JID.
+returns a string with the userid of the JID.
+If the string is an address (bob%jabber.org) then
+the function will return it as an address
+(bob@jabber.org).
+
+=item GetServer
+
+  GetServer()
+
+returns a string with the server of the JID.
+
+=item GerResource
+
+  GetResource()
+
+returns a string with the resource of the JID.
+
+=item GetJID
+
+  GetJID()      
+  GetJID("full")
+  GetJID("base")
+returns a string that represents the JID stored
+within.  If the "full" string is specified, then
+you get the full JID, including Resource, which
+should be used to send to the server.  If the "base",
+string is specified, then you will just get
+user@server, or the base JID.
+
+=back
 
 =head2 Creation functions
 
-  SetJID(userid=>string,   - set multiple fields in the jid at
-         server=>string,     one time.  This is a cumulative
-         resource=>string)   and over writing action.  If you set
-  SetJID(string)             the "userid" attribute twice, the second
-                             setting is what is used.  If you set
-                             the server, and then set the resource
-                             then both will be in the jid.  If all
-                             you pass is a string, then that string
-                             is used as the JID.  For valid settings
-                             read the specific Set functions below.
+=over 4
 
-  SetUserID(string) - sets the userid.  Must be a valid userid or the
-                      server will complain if you try to use this JID
-                      to talk to the server.  If the string is an
-                      address then it will be converted to the %
-                      form suitable for using as a User ID.
+=item SetJID
 
-  SetServer(string) - sets the server.  Must be a valid host on the
-                      network or the server will not be able to talk
-                      to it.
+  SetJID(userid=>string,  
+         server=>string,  
+         resource=>string)
+  SetJID(string)          
 
-  SetResource(string) - sets the resource of the userid to talk to.
+set multiple fields in the jid at
+one time.  This is a cumulative
+and over writing action.  If you set
+the "userid" attribute twice, the second
+setting is what is used.  If you set
+the server, and then set the resource
+then both will be in the jid.  If all
+you pass is a string, then that string
+is used as the JID.  For valid settings
+read the specific Set functions below.
+
+=item SetUserID
+
+  SetUserID(string)
+
+sets the userid.  Must be a valid userid or the
+server will complain if you try to use this JID
+to talk to the server.  If the string is an
+address then it will be converted to the %
+form suitable for using as a User ID.
+
+=item SerServer
+
+  SetServer(string)
+
+sets the server.  Must be a valid host on the
+network or the server will not be able to talk
+to it.
+
+=item SetResource
+
+  SetResource(string)
+
+sets the resource of the userid to talk to.
+
+=back
 
 =head1 AUTHOR
 

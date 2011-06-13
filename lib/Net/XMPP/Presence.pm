@@ -27,17 +27,17 @@ Net::XMPP::Presence - XMPP Presence Module
 
 =head1 SYNOPSIS
 
-  Net::XMPP::Presence is a companion to the Net::XMPP module.
-  It provides the user a simple interface to set and retrieve all
-  parts of an XMPP Presence.
+Net::XMPP::Presence is a companion to the Net::XMPP module.
+It provides the user a simple interface to set and retrieve all
+parts of an XMPP Presence.
 
 =head1 DESCRIPTION
 
-  A Net::XMPP::Presence object is passed to the callback function for
-  the message.  Also, the first argument to the callback functions is
-  the session ID from XML::Streams.  There are some cases where you
-  might want this information, like if you created a Client that
-  connects to two servers at once, or for writing a mini server.
+A Net::XMPP::Presence object is passed to the callback function for
+the message.  Also, the first argument to the callback functions is
+the session ID from XML::Streams.  There are some cases where you
+might want this information, like if you created a Client that
+connects to two servers at once, or for writing a mini server.
 
     use Net::XMPP;
 
@@ -48,190 +48,296 @@ Net::XMPP::Presence - XMPP Presence Module
       .
     }
 
-  You now have access to all of the retrieval functions available.
+You now have access to all of the retrieval functions available.
 
-  To create a new presence to send to the server:
+To create a new presence to send to the server:
 
     use Net::XMPP;
 
     $Pres = Net::XMPP::Presence->new();
 
-  Now you can call the creation functions below to populate the tag
-  before sending it.
+Now you can call the creation functions below to populate the tag
+before sending it.
 
 =head1 METHODS
 
 =head2 Retrieval functions
 
-  GetTo()      - returns the value in the to='' attribute for the
-  GetTo("jid")   <presence/>.  If you specify "jid" as an argument
-                 then a Net::XMPP::JID object is returned and
-                 you can easily parse the parts of the JID.
+=over 4
 
-                 $to    = $Pres->GetTo();
-                 $toJID = $Pres->GetTo("jid");
+=item GetTo
 
-  GetFrom()      - returns the value in the from='' attribute for the
-  GetFrom("jid")   <presence/>.  If you specify "jid" as an argument
-                   then a Net::XMPP::JID object is returned and
-                   you can easily parse the parts of the JID.
+  GetTo()
 
-                   $from    = $Pres->GetFrom();
-                   $fromJID = $Pres->GetFrom("jid");
+returns the value in the to='' attribute for the <presence/>.  
 
-  GetType() - returns the type='' attribute of the <presence/>.  Each
-              presence is one of seven types:
+  GetTo("jid")
 
-                available       available to receive messages; default
-                unavailable     unavailable to receive anything
-                subscribe       ask the recipient to subscribe you
-                subscribed      tell the sender they are subscribed
-                unsubscribe     ask the recipient to unsubscribe you
-                unsubscribed    tell the sender they are unsubscribed
-                probe           probe
 
-              $type = $Pres->GetType();
+If you specify "jid" as an argument
+then a Net::XMPP::JID object is returned and
+you can easily parse the parts of the JID.
 
-  GetStatus() - returns a string with the current status of the resource.
+  $to    = $Pres->GetTo();
+  $toJID = $Pres->GetTo("jid");
 
-                $status = $Pres->GetStatus();
+=item GetFrom
 
-  GetPriority() - returns an integer with the priority of the resource
-                  The default is 0 if there is no priority in this
-                  presence.
+  GetFrom()
 
-                  $priority = $Pres->GetPriority();
+returns the value in the from='' attribute for the <presence/>.
 
-  GetShow() - returns a string with the state the client should show.
+  GetFrom("jid")
 
-              $show = $Pres->GetShow();
+If you specify "jid" as an argument
+then a Net::XMPP::JID object is returned and
+you can easily parse the parts of the JID.
+
+  $from    = $Pres->GetFrom();
+  $fromJID = $Pres->GetFrom("jid");
+
+=item GetType
+
+  GetType()
+
+returns the type='' attribute of the <presence/>.  Each
+presence is one of seven types:
+
+  available       available to receive messages; default
+  unavailable     unavailable to receive anything
+  subscribe       ask the recipient to subscribe you
+  subscribed      tell the sender they are subscribed
+  unsubscribe     ask the recipient to unsubscribe you
+  unsubscribed    tell the sender they are unsubscribed
+  probe           probe
+
+  $type = $Pres->GetType();
+
+=item GetStatus
+
+  GetStatus()
+
+returns a string with the current status of the resource.
+
+  $status = $Pres->GetStatus();
+
+=item GetPriority
+
+  GetPriority()
+
+returns an integer with the priority of the resource
+The default is 0 if there is no priority in this
+presence.
+
+  $priority = $Pres->GetPriority();
+
+=item GetShow
+
+  GetShow()
+
+Returns a string with the state the client should show.
+
+  $show = $Pres->GetShow();
+
+=back
 
 =head2 Creation functions
 
-  SetPresence(to=>string|JID     - set multiple fields in the <presence/>
-              from=>string|JID,    at one time.  This is a cumulative
-              type=>string,        and over writing action.  If you set
-              status=>string,      the "to" attribute twice, the second
-              priority=>integer,   setting is what is used.  If you set
-              meta=>string,        the status, and then set the priority
-              icon=>string,        then both will be in the <presence/>
-              show=>string,        tag.  For valid settings read the
-              loc=>string)         specific Set functions below.
+=over 4
 
-                        $Pres->SetPresence(TYPE=>"away",
-					   StatuS=>"Out for lunch");
+=item SetPresence
 
-  SetTo(string) - sets the to attribute.  You can either pass a string
-  SetTo(JID)      or a JID object.  They must be valid JIDs or the
-                  server will return an error message.
-                  (ie.  bob@jabber.org/Silent Bob, etc...)
+  SetPresence(to=>string|JID    
+              from=>string|JID, 
+              type=>string,     
+              status=>string,   
+              priority=>integer,
+              meta=>string,     
+              icon=>string,     
+              show=>string,     
+              loc=>string)      
 
-                  $Pres->SetTo("bob\@jabber.org");
+set multiple fields in the <presence/>
+at one time.  This is a cumulative
+and over writing action.  If you set
+the "to" attribute twice, the second
+setting is what is used.  If you set
+the status, and then set the priority
+then both will be in the <presence/>
+tag.  For valid settings read the
+specific Set functions below.
 
-  SetFrom(string) - sets the from='' attribute.  You can either pass
-  SetFrom(JID)      a string or a JID object.  They must be valid JIDs
-                    or the server will return an error message. (ie.
-                    jabber:bob@jabber.org/Work)  This field is not
-                    required if you are writing a Client since the
-                    server will put the JID of your connection in there
-                    to prevent spamming.
+  $Pres->SetPresence(TYPE=>"away", StatuS=>"Out for lunch");
 
-                    $Pres->SetFrom("jojo\@jabber.org");
+=item SetTo
 
-  SetType(string) - sets the type attribute.  Valid settings are:
+  SetTo(string)
+  SetTo(JID)
 
-                    available      available to receive messages; default
-                    unavailable    unavailable to receive anything
-                    subscribe      ask the recipient to subscribe you
-                    subscribed     tell the sender they are subscribed
-                    unsubscribe    ask the recipient to unsubscribe you
-                    unsubscribed   tell the sender they are unsubscribed
-                    probe          probe
+sets the to attribute.  You can either pass a string
+or a JID object.  They must be valid JIDs or the
+server will return an error message.
+(ie.  bob@jabber.org/Silent Bob, etc...)
 
-                    $Pres->SetType("unavailable");
+  $Pres->SetTo("bob\@jabber.org");
 
-  SetStatus(string) - sets the status tag to be whatever string the user
-                      wants associated with that resource.
+=item SetFrom
 
-                      $Pres->SetStatus("Taking a nap");
+  SetFrom(string)
 
-  SetPriority(integer) - sets the priority of this resource.  The highest
-                         resource attached to the xmpp account is the
-                         one that receives the messages.
+sets the from='' attribute.  You can either pass
 
-                         $Pres->SetPriority(10);
+  SetFrom(JID)
 
-  SetShow(string) - sets the name of the icon or string to display for
-                    this resource.
+A string or a JID object.  They must be valid JIDs
+or the server will return an error message. (ie.
+jabber:bob@jabber.org/Work)  This field is not
+required if you are writing a Client since the
+server will put the JID of your connection in there
+to prevent spamming.
 
-                    $Pres->SetShow("away");
+  $Pres->SetFrom("jojo\@jabber.org");
 
-  Reply(hash) - creates a new Presence object and populates the to/from
-                fields.  If you specify a hash the same as with
-                SetPresence then those values will override the Reply
-                values.
+=item SetType
 
-                $Reply = $Pres->Reply();
-                $Reply = $Pres->Reply(type=>"subscribed");
+  SetType(string)
+
+sets the type attribute.  Valid settings are:
+
+  available      available to receive messages; default
+  unavailable    unavailable to receive anything
+  subscribe      ask the recipient to subscribe you
+  subscribed     tell the sender they are subscribed
+  unsubscribe    ask the recipient to unsubscribe you
+  unsubscribed   tell the sender they are unsubscribed
+  probe          probe
+
+  $Pres->SetType("unavailable");
+
+=item SetStatus
+
+  SetStatus(string)
+
+sets the status tag to be whatever string the user
+wants associated with that resource.
+
+  $Pres->SetStatus("Taking a nap");
+
+=item SetPriority
+
+  SetPriority(integer)
+
+sets the priority of this resource.  The highest
+resource attached to the xmpp account is the
+one that receives the messages.
+
+  $Pres->SetPriority(10);
+
+=item SetShow
+
+  SetShow(string)
+
+Sets the name of the icon or string to display for this resource.
+
+  $Pres->SetShow("away");
+
+=item Reply
+
+  Reply(hash)
+
+creates a new Presence object and populates the to/from
+fields.  If you specify a hash the same as with
+SetPresence then those values will override the Reply
+values.
+
+  $Reply = $Pres->Reply();
+  $Reply = $Pres->Reply(type=>"subscribed");
+
+=back
 
 =head2 Removal functions
 
-  RemoveTo() -  removes the to attribute from the <presence/>.
+=over 4
 
-                $Pres->RemoveTo();
+=item RemoveTo
 
-  RemoveFrom() -  removes the from attribute from the <presence/>.
+removes the to attribute from the <presence/>.
 
-                  $Pres->RemoveFrom();
+  $Pres->RemoveTo();
 
-  RemoveType() -  removes the type attribute from the <presence/>.
+=item RemoveFrom
 
-                  $Pres->RemoveType();
+removes the from attribute from the <presence/>.
 
-  RemoveStatus() -  removes the <status/> element from the <presence/>.
+ $Pres->RemoveFrom();
 
-                    $Pres->RemoveStatus();
+=item RemoveType
 
-  RemovePriority() -  removes the <priority/> element from the
-                      <presence/>.
+removes the type attribute from the <presence/>.
 
-                      $Pres->RemovePriority();
+ $Pres->RemoveType();
 
-  RemoveShow() -  removes the <show/> element from the <presence/>.
+=item RemoveStatus
 
-                  $Pres->RemoveShow();
+removes the <status/> element from the <presence/>.
+
+ $Pres->RemoveStatus();
+
+=item RemovePriority
+
+removes the <priority/> element from the <presence/>.
+
+ $Pres->RemovePriority();
+
+=item RemoveShow
+
+removes the <show/> element from the <presence/>.
+
+  $Pres->RemoveShow();
+
+=back
 
 =head2 Test functions
 
-  DefinedTo() - returns 1 if the to attribute is defined in the
-                <presence/>, 0 otherwise.
+=over 4
 
-                $test = $Pres->DefinedTo();
+=item  DefinedTo
 
-  DefinedFrom() - returns 1 if the from attribute is defined in the
-                  <presence/>, 0 otherwise.
+returns 1 if the to attribute is defined in the <presence/>, 0 otherwise.
 
-                  $test = $Pres->DefinedFrom();
+  $test = $Pres->DefinedTo();
 
-  DefinedType() - returns 1 if the type attribute is defined in the
-                  <presence/>, 0 otherwise.
+=item DefinedFrom
 
-                   $test = $Pres->DefinedType();
+returns 1 if the from attribute is defined in the <presence/>, 0 otherwise.
 
-  DefinedStatus() - returns 1 if <status/> is defined in the
-                    <presence/>, 0 otherwise.
+ $test = $Pres->DefinedFrom();
 
-                    $test = $Pres->DefinedStatus();
+=item DefinedType
 
-  DefinedPriority() - returns 1 if <priority/> is defined in the
-                      <presence/>, 0 otherwise.
+returns 1 if the type attribute is defined in the <presence/>, 0 otherwise.
 
-                      $test = $Pres->DefinedPriority();
+  $test = $Pres->DefinedType();
 
-  DefinedShow() - returns 1 if <show/> is defined in the <presence/>,
-                  0 otherwise.
+=item DefinedStatus
 
-                  $test = $Pres->DefinedShow();
+returns 1 if <status/> is defined in the <presence/>, 0 otherwise.
+
+  $test = $Pres->DefinedStatus();
+
+=item DefinedPriority
+
+returns 1 if <priority/> is defined in the <presence/>, 0 otherwise.
+
+  $test = $Pres->DefinedPriority();
+
+=item DefinedShow
+
+returns 1 if <show/> is defined in the <presence/>, 0 otherwise.
+
+  $test = $Pres->DefinedShow();
+
+=back
 
 =head1 AUTHOR
 

@@ -27,27 +27,27 @@ Net::XMPP::Client - XMPP Client Module
 
 =head1 SYNOPSIS
 
-  Net::XMPP::Client is a module that provides a developer easy access
-  to the Extensible Messaging and Presence Protocol (XMPP).
+Net::XMPP::Client is a module that provides a developer easy access
+to the Extensible Messaging and Presence Protocol (XMPP).
 
 =head1 DESCRIPTION
 
-  Client.pm uses Protocol.pm to provide enough high level APIs and
-  automation of the low level APIs that writing an XMPP Client in
-  Perl is trivial.  For those that wish to work with the low level
-  you can do that too, but those functions are covered in the
-  documentation for each module.
+Client.pm uses Protocol.pm to provide enough high level APIs and
+automation of the low level APIs that writing an XMPP Client in
+Perl is trivial.  For those that wish to work with the low level
+you can do that too, but those functions are covered in the
+documentation for each module.
 
-  Net::XMPP::Client provides functions to connect to an XMPP server,
-  login, send and receive messages, set personal information, create
-  a new user account, manage the roster, and disconnect.  You can use
-  all or none of the functions, there is no requirement.
+Net::XMPP::Client provides functions to connect to an XMPP server,
+login, send and receive messages, set personal information, create
+a new user account, manage the roster, and disconnect.  You can use
+all or none of the functions, there is no requirement.
 
-  For more information on how the details for how Net::XMPP is written
-  please see the help for Net::XMPP itself.
+For more information on how the details for how Net::XMPP is written
+please see the help for L<Net::XMPP> itself.
 
-  For a full list of high level functions available please see
-  Net::XMPP::Protocol.
+For a full list of high level functions available please see
+Net::XMPP::Protocol.
 
 =head2 Basic Functions
 
@@ -63,11 +63,10 @@ Net::XMPP::Client - XMPP Client Module
                   resource=>"Work"
                  );
 
-    #
-    # For the list of available functions see Net::XMPP::Protocol.
-    #
 
-    $Con->Disconnect();
+For the list of available functions see L<Net::XMPP::Protocol>.
+
+  $Con->Disconnect();
 
 =head1 METHODS
 
