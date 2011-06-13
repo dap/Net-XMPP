@@ -27,14 +27,14 @@ Net::XMPP::Debug - XMPP Debug Module
 
 =head1 SYNOPSIS
 
-  Net::XMPP::Debug is a module that provides a developer easy access
-  to logging debug information.
+Net::XMPP::Debug is a module that provides a developer easy access
+to logging debug information.
 
 =head1 DESCRIPTION
 
-  Debug is a helper module for the Net::XMPP modules.  It provides
-  the Net::XMPP modules with an object to control where, how, and
-  what is logged.
+Debug is a helper module for the Net::XMPP modules.  It provides
+the Net::XMPP modules with an object to control where, how, and
+what is logged.
 
 =head2 Basic Functions
 
@@ -50,60 +50,83 @@ Net::XMPP::Debug - XMPP Debug Module
 
 =head2 Basic Functions
 
-    new(hash) - creates the Debug object.  The hash argument is passed
-                to the Init function.  See that function description
-                below for the valid settings.
+=over 4
 
-    Init(level=>integer,  - initializes the debug object.  The level
-         file=>string,      determines the maximum level of debug
-         header=>string,    messages to log:
-         setdefault=>0|1,     0 - Base level Output (default)
-         usedefault=>0|1,     1 - High level API calls
-         time=>0|1)           2 - Low level API calls
-                              ...
-                              N - Whatever you want....
-                            The file determines where the debug log
-                            goes.  You can either specify a path to
-                            a file, or "stdout" (the default).  "stdout"
-                            tells Debug to send all of the debug info
-                            sent to this object to go to stdout.
-                            header is a string that will preappended
-                            to the beginning of all log entries.  This
-                            makes it easier to see what generated the
-                            log entry (default is "Debug").
-                            setdefault saves the current filehandle
-                            and makes it available for other Debug
-                            objects to use.  To use the default set
-                            usedefault to 1.  The time parameter
-                            specifies whether or not to add a timestamp
-                            to the beginning of each logged line.
+=item new
 
-    LogN(array) - Logs the elements of the array at the corresponding
-                  debug level N.  If you pass in a reference to an
-                  array or hash then they are printed in a readable
-                  way.  (ie... Log0, Log2, Log100, etc...)
+    new(hash)
+
+creates the Debug object.  The hash argument is passed
+to the Init function.  See that function description
+below for the valid settings.
+
+=item Init
+
+    Init(level=>integer, 
+         file=>string,   
+         header=>string, 
+         setdefault=>0|1,
+         usedefault=>0|1,
+         time=>0|1)      
+
+initializes the debug object.  The level
+determines the maximum level of debug
+messages to log:
+
+  0 - Base level Output (default)
+  1 - High level API calls
+  2 - Low level API calls
+  ...
+  N - Whatever you want....
+
+The file determines where the debug log
+goes.  You can either specify a path to
+a file, or "stdout" (the default).  "stdout"
+tells Debug to send all of the debug info
+sent to this object to go to stdout.
+header is a string that will preappended
+to the beginning of all log entries.  This
+makes it easier to see what generated the
+log entry (default is "Debug").
+setdefault saves the current filehandle
+and makes it available for other Debug
+objects to use.  To use the default set
+usedefault to 1.  The time parameter
+specifies whether or not to add a timestamp
+to the beginning of each logged line.
+
+=item LogN
+
+  LogN(array)
+
+Logs the elements of the array at the corresponding
+debug level N.  If you pass in a reference to an
+array or hash then they are printed in a readable
+way.  (ie... Log0, Log2, Log100, etc...)
+
+=back
 
 =head1 EXAMPLE
 
   $Debug = Net::XMPP:Debug->new(level=>2,
                                header=>"Example");
 
-    $Debug->Log0("test");
+  $Debug->Log0("test");
 
-    $Debug->Log2("level 2 test");
+  $Debug->Log2("level 2 test");
 
-    $hash{a} = "atest";
-    $hash{b} = "btest";
+  $hash{a} = "atest";
+  $hash{b} = "btest";
 
-    $Debug->Log1("hashtest",\%hash);
+  $Debug->Log1("hashtest",\%hash);
 
-  You would get the following log:
+You would get the following log:
 
     Example: test
     Example: level 2 test
     Example: hashtest { a=>"atest" b=>"btest" }
 
-  If you had set the level to 1 instead of 2 you would get:
+If you had set the level to 1 instead of 2 you would get:
 
     Example: test
     Example: hashtest { a=>"atest" b=>"btest" }
