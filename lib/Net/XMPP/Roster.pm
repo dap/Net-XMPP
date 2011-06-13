@@ -27,16 +27,16 @@ Net::XMPP::Roster - XMPP Roster Object
 
 =head1 SYNOPSIS
 
-  Net::XMPP::Roster is a module that provides a developer an easy
-  interface to an XMPP roster.  It provides high level functions to
-  query, update, and manage a user's roster.
+Net::XMPP::Roster is a module that provides a developer an easy
+interface to an XMPP roster.  It provides high level functions to
+query, update, and manage a user's roster.
 
 =head1 DESCRIPTION
 
-  The Roster object seeks to provide an easy to use API for interfacing
-  with a user's roster.  When you instantiate it, it automatically
-  registers with the connection to receivce the correct packets so
-  that it can track all roster updates, and presence packets.
+The Roster object seeks to provide an easy to use API for interfacing
+with a user's roster.  When you instantiate it, it automatically
+registers with the connection to receivce the correct packets so
+that it can track all roster updates, and presence packets.
 
 =head2 Basic Functions
 
@@ -88,8 +88,8 @@ Net::XMPP::Roster - XMPP Roster Object
 
 =head2 Advanced Functions
 
-  These functions are only needed if you want to manually control
-  the Roster.
+These functions are only needed if you want to manually control
+the Roster.
 
   $Roster->add('bob@jabber.org',
                name=>"Bob",
@@ -117,65 +117,121 @@ Net::XMPP::Roster - XMPP Roster Object
 
 =head2 Basic Functions
 
+=over 4
 
-  new(connection=>object) - This creates and initializes the Roster
-                            object.  The connection object is required
-                            so that the Roster can interact with the
-                            main connection object.  It needs to be an
-                            object that inherits from
-                            Net::XMPP::Connection.
+=item new
 
-  clear() - removes everything from the database.
+  new(connection=>object)
 
-  exists(jid) - return 1 if the JID exists in the database, undef
-                otherwise.  The jid can either be a string, or a
-                Net::XMPP::JID object.
+This creates and initializes the Roster
+object.  The connection object is required
+so that the Roster can interact with the
+main connection object.  It needs to be an
+object that inherits from L<Net::XMPP::Connection>.
 
-  groupExists(group) - return 1 if the group exists in the database,
-                       undef otherwise.
+=item clear
 
-  groups() - returns a list of all of the roster groups.
+  clear()
 
-  jids([type,    - returns a list of all of the matching JIDs.  The valid
-       [group]])   types are:
+removes everything from the database.
+
+=item exists
+
+  exists(jid)
+
+return 1 if the JID exists in the database, undef
+otherwise.  The jid can either be a string, or a L<Net::XMPP::JID> object.
+
+=item groupExists
+
+  groupExists(group)
+
+return 1 if the group exists in the database, undef otherwise.
+
+=item groups
+
+  groups()
+
+Returns a list of all of the roster groups.
+
+=item jids
+
+  jids([type, [group]])
+
+returns a list of all of the matching JIDs.  The valid
+types are:
 
                     all     - return all JIDs in the roster. (default)
                     nogroup - return all JIDs not in a roster group.
                     group   - return all of the JIDs in the specified
                               roster group.
 
-  online(jid) - return 1 if the JID is online, undef otherwise.  The
-                jid can either be a string, or a Net::XMPP::JID object.
+=item online
 
-  query(jid,   - return a hash representing all of the data in the
-        [key])   DB for this JID.  The jid can either be a string,
-                 or a Net::XMPP::JID object.  If you specify a key,
-                 then only the value for that key is returned.
+  online(jid)
 
-  resource(jid) - return the string representing the resource with the
-                  highest priority for the JID.  The jid can either be
-                  a string, or a Net::XMPP::JID object.
+return 1 if the JID is online, undef otherwise.  The
+jid can either be a string, or a L<Net::XMPP::JID> object.
 
-  resourceQuery(jid,      - return a hash representing all of the data
-                resource,   the DB for the resource for this JID.  The
-                [key])      jid can either be a string, or a
-                            Net::XMPP::JID object.  If you specify a
-                            key, then only the value for that key is
-                            returned.
+=item query
 
-  resources(jid) - returns the list of resources for the JID in order
-                   of highest priority to lowest priority.  The jid can
-                   either be a string, or a Net::XMPP::JID object.
+  query(jid, [key])
 
-  resourceStore(jid,      - store the specified value in the DB under
-                resource,   the specified key for the resource for this
-                key,        JID.  The jid can either be a string, or a
-                value)      Net::XMPP::JID object.
+return a hash representing all of the data in the
+DB for this JID.  The jid can either be a string,
+or a Net::XMPP::JID object.  If you specify a key,
+then only the value for that key is returned.
 
-  store(jid,      - store the specified value in the DB under the
-        key,        specified key for this JID.  The jid can either
-        value)      be a string, or a Net::XMPP::JID object.
+=item resource
 
+  resource(jid)
+
+return the string representing the resource with the
+highest priority for the JID.  The jid can either be
+a string, or a Net::XMPP::JID object.
+
+=item resourceQuery
+
+  resourceQuery(jid,     
+                resource,
+                [key])   
+
+return a hash representing all of the data
+the DB for the resource for this JID.  The
+jid can either be a string, or a
+Net::XMPP::JID object.  If you specify a
+key, then only the value for that key is
+returned.
+
+=item resources
+
+  resources(jid)
+
+returns the list of resources for the JID in order
+of highest priority to lowest priority.  The jid can
+either be a string, or a Net::XMPP::JID object.
+
+=item resourceStore
+
+  resourceStore(jid,     
+                resource,
+                key,     
+                value)   
+
+store the specified value in the DB under
+the specified key for the resource for this
+JID.  The jid can either be a string, or a
+Net::XMPP::JID object.
+
+=item store
+
+  store(jid, key, value) 
+
+store the specified value in the DB under the
+specified key for this JID.  The jid can either
+be a string, or a Net::XMPP::JID object.
+
+=back
 
 
 =head2 Advanced Functions
