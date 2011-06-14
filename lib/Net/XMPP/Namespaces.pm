@@ -67,8 +67,6 @@ define the functions needed to access the XML for a namespace.  We will
 go over the full docs, and then show two examples of real namespaces so
 that you can see what we are talking about.
 
-=back
-
 =head2 Overview
 
 To avoid a lot of nasty modules populating memory that are not used,

@@ -27,48 +27,57 @@ Net::XMPP::Protocol - XMPP Protocol Module
 
 =head1 SYNOPSIS
 
-  Net::XMPP::Protocol is a module that provides a developer easy
-  access to the XMPP Instant Messaging protocol.  It provides high
-  level functions to the Net::XMPP Client object.  These functions are
-  inherited by that modules.
+Net::XMPP::Protocol is a module that provides a developer easy
+access to the XMPP Instant Messaging protocol.  It provides high
+level functions to the Net::XMPP Client object.  These functions are
+inherited by that modules.
 
 =head1 DESCRIPTION
 
-  Protocol.pm seeks to provide enough high level APIs and automation of
-  the low level APIs that writing a XMPP Client in Perl is trivial.  For
-  those that wish to work with the low level you can do that too, but
-  those functions are covered in the documentation for each module.
+Protocol.pm seeks to provide enough high level APIs and automation of
+the low level APIs that writing a XMPP Client in Perl is trivial.  For
+those that wish to work with the low level you can do that too, but
+those functions are covered in the documentation for each module.
 
-  Net::XMPP::Protocol provides functions to login, send and receive
-  messages, set personal information, create a new user account, manage
-  the roster, and disconnect.  You can use all or none of the functions,
-  there is no requirement.
+Net::XMPP::Protocol provides functions to login, send and receive
+messages, set personal information, create a new user account, manage
+the roster, and disconnect.  You can use all or none of the functions,
+there is no requirement.
 
-  For more information on how the details for how Net::XMPP is written
-  please see the help for Net::XMPP itself.
+For more information on how the details for how L<Net::XMPP> is written
+please see the help for Net::XMPP itself.
 
-  For more information on writing a Client see Net::XMPP::Client.
+For more information on writing a Client see L<Net::XMPP::Client>.
 
 =head2 Modes
 
-  Several of the functions take a mode argument that let you specify how
-  the function should behave:
+Several of the functions take a mode argument that let you specify how
+the function should behave:
 
-    block - send the packet with an ID, and then block until an answer
-            comes back.  You can optionally specify a timeout so that
-            you do not block forever.
+=over 4
 
-    nonblock - send the packet with an ID, but then return that id and
-               control to the master program.  Net::XMPP is still
-               tracking this packet, so you must use the CheckID function
-               to tell when it comes in.  (This might not be very
-               useful...)
+=item block
 
-    passthru - send the packet with an ID, but do NOT register it with
-               Net::XMPP, then return the ID.  This is useful when
-               combined with the XPath function because you can register
-               a one shot function tied to the id you get back.
+send the packet with an ID, and then block until an answer
+comes back.  You can optionally specify a timeout so that
+you do not block forever.
 
+=item nonblock
+
+send the packet with an ID, but then return that id and
+control to the master program.  Net::XMPP is still
+tracking this packet, so you must use the CheckID function
+to tell when it comes in.  (This might not be very
+useful...)
+
+=item passthru
+
+send the packet with an ID, but do NOT register it with
+Net::XMPP, then return the ID.  This is useful when
+combined with the XPath function because you can register
+a one shot function tied to the id you get back.
+
+=back
 
 =head2 Basic Functions
 
@@ -270,217 +279,292 @@ Net::XMPP::Protocol - XMPP Protocol Module
 
 =head2 Basic Functions
 
-    GetErrorCode() - returns a string that will hopefully contain some
-                     useful information about why a function returned
-                     an undef to you.
+=over 4
 
-    SetErrorCode(string) - set a useful error message before you return
-                           an undef to the caller.
+=item GetErrorCode()
 
-    SetCallBacks(message=>function,  - sets the callback functions for
-                 presence=>function,   the top level tags listed.  The
-                 iq=>function,         available tags to look for are
-                 send=>function,       <message/>, <presence/>, and
-                 receive=>function,    <iq/>.  If a packet is received
-                 update=>function)     with an ID which is found in the
-                                       registerd ID list (see RegisterID
-                                       below) then it is not sent to
-                                       these functions, instead it
-                                       is inserted into a LIST and can
-                                       be retrieved by some functions
-                                       we will mention later.
+returns a string that will hopefully contain some
+useful information about why a function returned
+an undef to you.
 
-                                       send and receive are used to
-                                       log what XML is sent and received.
-                                       update is used as way to update
-                                       your program while waiting for
-                                       a packet with an ID to be
-                                       returned (useful for GUI apps).
+=item SetErrorCode
 
-                                       A major change that came with
-                                       the last release is that the
-                                       session id is passed to the
-                                       callback as the first argument.
-                                       This was done to facilitate
-                                       the Server module.
+  SetErrorCode(string)
 
-                                       The next argument depends on
-                                       which callback you are talking
-                                       about.  message, presence, and iq
-                                       all get passed in Net::XMPP
-                                       objects that match those types.
-                                       send and receive get passed in
-                                       strings.  update gets passed
-                                       nothing, not even the session id.
+set a useful error message before you return
+an undef to the caller.
 
-                                       If you set the function to undef,
-                                       then the callback is removed from
-                                       the list.
+=item SetCallBacks
 
-    SetPresenceCallBacks(type=>function - sets the callback functions for
-                         etc...)          the specified presence type.
-                                          The function takes types as the
-                                          main key, and lets you specify
-                                          a function for each type of
-                                          packet you can get.
-                                            "available"
-                                            "unavailable"
-                                            "subscribe"
-                                            "unsubscribe"
-                                            "subscribed"
-                                            "unsubscribed"
-                                            "probe"
-                                            "error"
-                                          When it gets a <presence/>
-                                          packet it checks the type=''
-                                          for a defined callback.  If
-                                          there is one then it calls the
-                                          function with two arguments:
-                                            the session ID, and the
-                                            Net::XMPP::Presence object.
-
-                                          If you set the function to
-                                          undef, then the callback is
-                                          removed from the list.
-
-                        NOTE: If you use this, which is a cleaner method,
-                              then you must *NOT* specify a callback for
-                              presence in the SetCallBacks function.
-
-                                          Net::XMPP defines a few default
-                                          callbacks for various types:
-
-                                          "subscribe" -
-                                            replies with subscribed
-
-                                          "unsubscribe" -
-                                            replies with unsubscribed
-
-                                          "subscribed" -
-                                            replies with subscribed
-
-                                          "unsubscribed" -
-                                            replies with unsubscribed
+  SetCallBacks(message=>function, 
+                 presence=>function,
+                 iq=>function,      
+                 send=>function,    
+                 receive=>function, 
+                 update=>function)  
 
 
-    SetMessageCallBacks(type=>function, - sets the callback functions for
-                        etc...)           the specified message type. The
-                                          function takes types as the
-                                          main key, and lets you specify
-                                          a function for each type of
-                                          packet you can get.
-                                           "normal"
-                                           "chat"
-                                           "groupchat"
-                                           "headline"
-                                           "error"
-                                         When it gets a <message/> packet
-                                         it checks the type='' for a
-                                         defined callback. If there is
-                                         one then it calls the function
-                                         with two arguments:
-                                           the session ID, and the
-                                           Net::XMPP::Message object.
+sets the callback functions for
+the top level tags listed.  The
+available tags to look for are
+<message/>, <presence/>, and
+<iq/>.  If a packet is received
+with an ID which is found in the
+registerd ID list (see RegisterID
+below) then it is not sent to
+these functions, instead it
+is inserted into a LIST and can
+be retrieved by some functions
+we will mention later.
 
-                                         If you set the function to
-                                         undef, then the callback is
-                                         removed from the list.
+send and receive are used to
+log what XML is sent and received.
+update is used as way to update
+your program while waiting for
+a packet with an ID to be
+returned (useful for GUI apps).
 
-                       NOTE: If you use this, which is a cleaner method,
-                             then you must *NOT* specify a callback for
-                             message in the SetCallBacks function.
+A major change that came with
+the last release is that the
+session id is passed to the
+callback as the first argument.
+This was done to facilitate
+the Server module.
+
+The next argument depends on
+which callback you are talking
+about.  message, presence, and iq
+all get passed in Net::XMPP
+objects that match those types.
+send and receive get passed in
+strings.  update gets passed
+nothing, not even the session id.
+
+If you set the function to undef,
+then the callback is removed from
+the list.
+
+=item SetPresenceCallBacks
+
+  SetPresenceCallBacks(type=>function etc...)
+
+sets the callback functions for
+the specified presence type.
+The function takes types as the
+main key, and lets you specify
+a function for each type of
+packet you can get.
+
+  "available"
+  "unavailable"
+  "subscribe"
+  "unsubscribe"
+  "subscribed"
+  "unsubscribed"
+  "probe"
+  "error"
+
+When it gets a <presence/>
+packet it checks the type=''
+for a defined callback.  If
+there is one then it calls the
+function with two arguments:
+
+  the session ID, and the
+  Net::XMPP::Presence object.
+
+If you set the function to
+undef, then the callback is
+removed from the list.
+
+NOTE: If you use this, which is a cleaner method,
+then you must *NOT* specify a callback for
+presence in the SetCallBacks function.
+
+ Net::XMPP defines a few default
+ callbacks for various types:
+
+ "subscribe" -
+   replies with subscribed
+
+ "unsubscribe" -
+   replies with unsubscribed
+
+ "subscribed" -
+   replies with subscribed
+
+ "unsubscribed" -
+   replies with unsubscribed
+
+=item SetMessageCallBacks
+
+    SetMessageCallBacks(type=>function, etc...)
+
+sets the callback functions for
+the specified message type. The
+function takes types as the
+main key, and lets you specify
+a function for each type of
+packet you can get.
+
+ "normal"
+ "chat"
+ "groupchat"
+ "headline"
+ "error"
+
+When it gets a <message/> packet
+it checks the type='' for a
+defined callback. If there is
+one then it calls the function
+with two arguments:
+
+  the session ID, and the
+  Net::XMPP::Message object.
+
+If you set the function to
+undef, then the callback is
+removed from the list.
+
+NOTE: If you use this, which is a cleaner method,
+then you must *NOT* specify a callback for
+message in the SetCallBacks function.
+
+=item SetIQCallBacks
+
+  SetIQCallBacks(namespace=>{      
+                     get=>function,  
+                     set=>function,  
+                     result=>function
+                   },                
+                   etc...)
 
 
-    SetIQCallBacks(namespace=>{      - sets the callback functions for
-                     get=>function,    the specified namespace. The
-                     set=>function,    function takes namespaces as the
-                     result=>function  main key, and lets you specify a
-                   },                  function for each type of packet
-                   etc...)             you can get.
-                                         "get"
-                                         "set"
-                                         "result"
-                                       When it gets an <iq/> packet it
-                                       checks the type='' and the
-                                       xmlns='' for a defined callback.
-                                       If there is one then it calls
-                                       the function with two arguments:
-                                       the session ID, and the
-                                       Net::XMPP::xxxx object.
+sets the callback functions for
+the specified namespace. The
+function takes namespaces as the
+main key, and lets you specify a
+function for each type of packet
+you can get.
 
-                                       If you set the function to undef,
-                                       then the callback is removed from
-                                       the list.
+  "get"
+  "set"
+  "result"
 
-                       NOTE: If you use this, which is a cleaner method,
-                             then you must *NOT* specify a callback for
-                             iq in the SetCallBacks function.
+When it gets an <iq/> packet it
+checks the type='' and the
+xmlns='' for a defined callback.
+If there is one then it calls
+the function with two arguments:
+the session ID, and the
+Net::XMPP::xxxx object.
 
-    SetXPathCallBacks(xpath=>function, - registers a callback function
-                      etc...)            for each xpath specified.  If
-                                         Net::XMPP matches the xpath,
-                                         then it calls the function with
-                                         two arguments:
-                                           the session ID, and the
-                                           Net::XMPP::Message object.
+If you set the function to undef,
+then the callback is removed from
+the list.
 
-                                         Xpaths are rooted at each
-                                         packet:
-                                           /message[@type="chat"]
-                                           /iq/*[xmlns="jabber:iq:roster"][1]
-                                           ...
+NOTE: If you use this, which is a cleaner method,
+then you must *NOT* specify a callback for
+iq in the SetCallBacks function.
 
-    RemoveXPathCallBacks(xpath=>function, - unregisters a callback
-                         etc...)            function for each xpath
-                                            specified.
+=item SetXPathCallBacks
 
-    SetDirectXPathCallBacks(xpath=>function, - registers a callback function
-                            etc...)            for each xpath specified.  If
-                                               Net::XMPP matches the xpath,
-                                               then it calls the function with
-                                               two arguments:
-                                                 the session ID, and the
-                                                 XML::Stream::Node object.
 
-                                               Xpaths are rooted at each
-                                               packet:
-                                                 /anything
-                                                 /anotherthing/foo/[1]
-                                                 ...
+  SetXPathCallBacks(xpath=>function, etc...)
 
-                                               The big difference between this
-                                               and regular XPathCallBacks is
-                                               the fact that this passes in
-                                               the XML directly and not a
-                                               Net::XMPP based object.
+registers a callback function
+for each xpath specified.  If
+Net::XMPP matches the xpath,
+then it calls the function with
+two arguments:
 
-    RemoveDirectXPathCallBacks(xpath=>function, - unregisters a callback
-                               etc...)            function for each xpath
-                                                  specified.
+  the session ID, and the
+  Net::XMPP::Message object.
 
-    Process(integer) - takes the timeout period as an argument.  If no
-                       timeout is listed then the function blocks until
-                       a packet is received.  Otherwise it waits that
-                       number of seconds and then exits so your program
-                       can continue doing useful things.  NOTE: This is
-                       important for GUIs.  You need to leave time to
-                       process GUI commands even if you are waiting for
-                       packets.  The following are the possible return
-                       values, and what they mean:
+Xpaths are rooted at each
+packet:
 
-                           1   - Status ok, data received.
-                           0   - Status ok, no data received.
-                         undef - Status not ok, stop processing.
+  /message[@type="chat"]
+  /iq/*[xmlns="jabber:iq:roster"][1]
+  ...
 
-                       IMPORTANT: You need to check the output of every
-                       Process.  If you get an undef then the connection
-                       died and you should behave accordingly.
 
-    Send(object,         - takes either a Net::XMPP::xxxxx object or
-         ignoreActivity)   an XML string as an argument and sends it to
-    Send(string,           the server.  If you set ignoreActivty to 1,
-         ignoreActivity)   then the XML::Stream module will not record
-                           this packet as couting towards user activity.
+=item RemoveXPathCallBacks
+
+ RemoveXPathCallBacks(xpath=>function, etc...)
+
+unregisters a callback
+function for each xpath
+specified.
+
+=item SetDirectXPathCallBacks
+
+ SetDirectXPathCallBacks(xpath=>function, etc...)
+
+registers a callback function
+for each xpath specified.  If
+Net::XMPP matches the xpath,
+then it calls the function with
+two arguments:
+
+  the session ID, and the
+  XML::Stream::Node object.
+
+Xpaths are rooted at each
+packet:
+
+  /anything
+  /anotherthing/foo/[1]
+  ...
+
+The big difference between this
+and regular XPathCallBacks is
+the fact that this passes in
+the XML directly and not a
+Net::XMPP based object.
+
+=item RemoveDirectXPathCallBacks
+
+  RemoveDirectXPathCallBacks(xpath=>function, etc...)
+
+unregisters a callback
+function for each xpath
+specified.
+
+=item Process
+
+    Process(integer)
+takes the timeout period as an argument.  If no
+timeout is listed then the function blocks until
+a packet is received.  Otherwise it waits that
+number of seconds and then exits so your program
+can continue doing useful things.  NOTE: This is
+important for GUIs.  You need to leave time to
+process GUI commands even if you are waiting for
+packets.  The following are the possible return
+values, and what they mean:
+
+    1   - Status ok, data received.
+    0   - Status ok, no data received.
+  undef - Status not ok, stop processing.
+
+IMPORTANT: You need to check the output of every
+Process.  If you get an undef then the connection
+died and you should behave accordingly.
+
+=item Send
+
+    Send(object, ignoreActivity) 
+    Send(string, ignoreActivity) 
+
+takes either a Net::XMPP::xxxxx object or
+an XML string as an argument and sends it to
+the server.  If you set ignoreActivty to 1,
+then the XML::Stream module will not record
+this packet as couting towards user activity.
+
+=back
+
 =head2 ID Functions
 
     SendWithID(object) - takes either a Net::XMPP::xxxxx object or an
