@@ -27,7 +27,7 @@ Net::XMPP::PrivacyLists - XMPP Privacy Lists Object
 
 =head1 SYNOPSIS
 
-  This module is not yet complete.  Do not use.
+This module is not yet complete.  Do not use.
 
 =head1 DESCRIPTION
 

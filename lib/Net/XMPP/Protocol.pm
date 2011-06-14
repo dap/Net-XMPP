@@ -567,276 +567,469 @@ this packet as couting towards user activity.
 
 =head2 ID Functions
 
-    SendWithID(object) - takes either a Net::XMPP::xxxxx object or an
-    SendWithID(string)   XML string as an argument, adds the next
-                         available ID number and sends that packet to
-                         the server.  Returns the ID number assigned.
+=over
 
-    SendAndReceiveWithID(object,  - uses SendWithID and WaitForID to
-                         timeout)   provide a complete way to send and
-    SendAndReceiveWithID(string,    receive packets with IDs.  Can take
-                         timeout)   either a Net::XMPP::xxxxx object
-                                    or an XML string.  Returns the
-                                    proper Net::XMPP::xxxxx object
-                                    based on the type of packet
-                                    received.  The timeout is passed
-                                    on to WaitForID, see that function
-                                    for how the timeout works.
+=item SendWithID
 
-    ReceivedID(integer) - returns 1 if a packet has been received with
-                          specified ID, 0 otherwise.
+    SendWithID(object)
+    SendWithID(string)
 
-    GetID(integer) - returns the proper Net::XMPP::xxxxx object based
-                     on the type of packet received with the specified
-                     ID.  If the ID has been received the GetID returns
-                     0.
+takes either a Net::XMPP::xxxxx object or an
+XML string as an argument, adds the next
+available ID number and sends that packet to
+the server.  Returns the ID number assigned.
 
-    WaitForID(integer, - blocks until a packet with the ID is received.
-              timeout)   Returns the proper Net::XMPP::xxxxx object
-                         based on the type of packet received.  If the
-                         timeout limit is reached then if the packet
-                         does come in, it will be discarded.
+=item SendAndReceiveWithID
+
+    SendAndReceiveWithID(object, timeout)
+    SendAndReceiveWithID(string, timeout)
+
+uses SendWithID and WaitForID to
+provide a complete way to send and
+receive packets with IDs.  Can take
+either a Net::XMPP::xxxxx object
+or an XML string.  Returns the
+proper Net::XMPP::xxxxx object
+based on the type of packet
+received.  The timeout is passed
+on to WaitForID, see that function
+for how the timeout works.
+
+=item ReceivedID
+
+ ReceivedID(integer)
+
+returns 1 if a packet has been received with
+specified ID, 0 otherwise.
+
+=item GetID
+
+    GetID(integer)
+
+returns the proper Net::XMPP::xxxxx object based
+on the type of packet received with the specified
+ID.  If the ID has been received the GetID returns 0.
+
+=item WaitForID
+
+  WaitForID(integer, timeout)
+
+blocks until a packet with the ID is received.
+Returns the proper Net::XMPP::xxxxx object
+based on the type of packet received.  If the
+timeout limit is reached then if the packet
+does come in, it will be discarded.
 
 
-    NOTE:  Only <iq/> officially support ids, so sending a <message/>, or
-           <presence/> with an id is a risk.  The server will ignore the
-           id tag and pass it through, so both clients must support the
-           id tag for these functions to be useful.
+NOTE:  Only <iq/> officially support ids, so sending a <message/>, or
+<presence/> with an id is a risk.  The server will ignore the
+id tag and pass it through, so both clients must support the
+id tag for these functions to be useful.
+
+=back
 
 =head2 Namespace Functions
 
-    AddNamespace(ns=>string,  - This function is very complex.
-                 tag=>string,   It is a little too complex to
-                 xpath=>hash)   discuss within the confines of
-                                this small paragraph.  Please
-                                refer to the man page for
-                                Net::XMPP::Namespaces for the
-                                full documentation on this
-                                subject.
+=over 4
+
+=item AddNamespace
+
+    AddNamespace(ns=>string, 
+                 tag=>string,
+                 xpath=>hash)
+
+This function is very complex.
+It is a little too complex to
+discuss within the confines of
+this small paragraph.  Please
+refer to the man page for
+Net::XMPP::Namespaces for the
+full documentation on this
+subject.
+
+=back
 
 =head2 Message Functions
 
-    MessageSend(hash) - takes the hash and passes it to SetMessage in
-                        Net::XMPP::Message (refer there for valid
-                        settings).  Then it sends the message to the
-                        server.
+=over 4
+
+=item MessageSend
+
+    MessageSend(hash)
+
+takes the hash and passes it to SetMessage in
+Net::XMPP::Message (refer there for valid
+settings).  Then it sends the message to the
+server.
+
+=back
 
 =head2 Presence Functions
 
-    PresenceSend()                  - no arguments will send an empty
-    PresenceSend(hash,                Presence to the server to tell it
-                 signature=>string)   that you are available.  If you
-                                      provide a hash, then it will pass
-                                      that hash to the SetPresence()
-                                      function as defined in the
-                                      Net::XMPP::Presence module.
-                                      Optionally, you can specify a
-                                      signature and a jabber:x:signed
-                                      will be placed in the <presence/>.
+=over 4
+
+=item  PresenceSend
+
+  PresenceSend()
+  PresenceSend(hash, signature=>string)
+
+No arguments will send an empty
+Presence to the server to tell it
+that you are available.  If you
+provide a hash, then it will pass
+that hash to the SetPresence()
+function as defined in the
+Net::XMPP::Presence module.
+Optionally, you can specify a
+signature and a jabber:x:signed
+will be placed in the <presence/>.
+
+=back
 
 =head2 Subscription Functions
 
-    Subscription(hash) - taks the hash and passes it to SetPresence in
-                         Net::XMPP::Presence (refer there for valid
-                         settings).  Then it sends the subscription to
-                         server.
+=over 4
 
-                         The valid types of subscription are:
+=item Subscription
 
-                           subscribe    - subscribe to JID's presence
-                           unsubscribe  - unsubscribe from JID's presence
-                           subscribed   - response to a subscribe
-                           unsubscribed - response to an unsubscribe
+ Subscription(hash)
+
+taks the hash and passes it to SetPresence in
+Net::XMPP::Presence (refer there for valid
+settings).  Then it sends the subscription to
+server.
+
+The valid types of subscription are:
+
+  subscribe    - subscribe to JID's presence
+  unsubscribe  - unsubscribe from JID's presence
+  subscribed   - response to a subscribe
+  unsubscribed - response to an unsubscribe
+
+=back
 
 =head2 Presence DB Functions
 
-    PresenceDB() - Tell the object to initialize the callbacks to
-                   automatically populate the Presence DB.
+=over 4
 
-    PresenceDBParse(Net::XMPP::Presence) - for every presence that you
-                                             receive pass the Presence
-                                             object to the DB so that
-                                             it can track the resources
-                                             and priorities for you.
-                                             Returns either the presence
-                                             passed in, if it not able
-                                             to parsed for the DB, or the
-                                             current presence as found by
-                                             the PresenceDBQuery
-                                             function.
+=item PresenceDB
 
-    PresenceDBDelete(string|Net::XMPP::JID) - delete thes JID entry
-                                                from the DB.
+ PresenceDB()
 
-    PresenceDBClear() - delete all entries in the database.
+Tell the object to initialize the callbacks to
+automatically populate the Presence DB.
 
-    PresenceDBQuery(string|Net::XMPP::JID) - returns the NX::Presence
-                                               that was last received for
-                                               the highest priority of
-                                               this JID.  You can pass
-                                               it a string or a NX::JID
-                                               object.
+=item PresenceDBParse
 
-    PresenceDBResources(string|Net::XMPP::JID) - returns an array of
-                                                   resources in order
-                                                   from highest priority
-                                                   to lowest.
+  PresenceDBParse(Net::XMPP::Presence)
+
+for every presence that you
+receive pass the Presence
+object to the DB so that
+it can track the resources
+and priorities for you.
+Returns either the presence
+passed in, if it not able
+to parsed for the DB, or the
+current presence as found by
+the PresenceDBQuery
+function.
+
+=item PresenceDBDelete
+
+  PresenceDBDelete(string|Net::XMPP::JID)
+
+delete thes JID entry from the DB.
+
+=item PresenceDBClear
+
+ PresenceDBClear()
+
+delete all entries in the database.
+
+=item PresenceDBQuery
+
+  PresenceDBQuery(string|Net::XMPP::JID)
+
+returns the NX::Presence
+that was last received for
+the highest priority of
+this JID.  You can pass
+it a string or a NX::JID
+object.
+
+=item PresenceDBResources
+
+  PresenceDBResources(string|Net::XMPP::JID)
+
+returns an array of
+resources in order
+from highest priority
+to lowest.
+
+=back
 
 =head2 IQ Functions
 
 =head2 Auth Functions
 
-    AuthSend(username=>string, - takes all of the information and
-             password=>string,   builds a Net::XMPP::IQ::Auth packet.
-             resource=>string)   It then sends that packet to the
-                                 server with an ID and waits for that
-                                 ID to return.  Then it looks in
-                                 resulting packet and determines if
-                                 authentication was successful for not.
-                                 The array returned from AuthSend looks
-                                 like this:
-                                   [ type , message ]
-                                 If type is "ok" then authentication
-                                 was successful, otherwise message
-                                 contains a little more detail about the
-                                 error.
+=over 4
+
+=item AuthSend
+
+    AuthSend(username=>string,
+             password=>string,
+             resource=>string)
+
+takes all of the information and
+builds a L<Net::XMPP::IQ::Auth> packet.
+It then sends that packet to the
+server with an ID and waits for that
+ID to return.  Then it looks in
+resulting packet and determines if
+authentication was successful for not.
+The array returned from AuthSend looks
+like this:
+
+  [ type , message ]
+
+If type is "ok" then authentication
+was successful, otherwise message
+contains a little more detail about the
+error.
+
+=back
 
 =head2 IQ::Register Functions
 
-    RegisterRequest(to=>string,  - send an <iq/> request to the specified
-                    timeout=>int)  server/transport, if not specified it
-    RegisterRequest()              sends to the current active server.
-                                   The function returns a hash that
-                                   contains the required fields.   Here
-                                   is an example of the hash:
 
-                                   $hash{fields}    - The raw fields from
-                                                      the iq:register.
-                                                      To be used if there
-                                                      is no x:data in the
-                                                      packet.
-                                   $hash{instructions} - How to fill out
-                                                         the form.
-                                   $hash{form}   - The new dynamic forms.
+=over 4
 
-                                   In $hash{form}, the fields that are
-                                   present are the required fields the
-                                   server needs.
+=item RegisterRequest
 
-    RegisterSend(hash) - takes the contents of the hash and passes it
-                         to the SetRegister function in the module
-                         Net::XMPP::Query jabber:iq:register namespace.
-                         This function returns an array that looks like
-                         this:
+ RegisterRequest(to=>string,  timeout=>int)
+ RegisterRequest()
 
-                            [ type , message ]
+send an <iq/> request to the specified
+server/transport, if not specified it
+sends to the current active server.
+The function returns a hash that
+contains the required fields.   Here
+is an example of the hash:
 
-                         If type is "ok" then registration was
-                         successful, otherwise message contains a
-                         little more detail about the error.
+$hash{fields}    - The raw fields from
+                   the iq:register.
+                   To be used if there
+                   is no x:data in the
+                   packet.
+
+$hash{instructions} - How to fill out
+                      the form.
+
+$hash{form}   - The new dynamic forms.
+
+In $hash{form}, the fields that are
+present are the required fields the
+server needs.
+
+=item RegisterSend
+
+  RegisterSend(hash)
+
+takes the contents of the hash and passes it
+to the SetRegister function in the module
+Net::XMPP::Query jabber:iq:register namespace.
+This function returns an array that looks like
+this:
+
+  [ type , message ]
+
+If type is "ok" then registration was
+successful, otherwise message contains a
+little more detail about the error.
+
+=back
+
 
 =head2 Roster Functions
 
-    Roster() - returns a Net::XMPP::Roster object.  This will automatically
-               intercept all of the roster and presence packets sent from
-               the server and give you an accurate Roster.  For more
-               information please read the man page for Net::XMPP::Roster.
+=over 4
 
-    RosterParse(IQ object) - returns a hash that contains the roster
-                             parsed into the following data structure:
+=item Roster
 
-                  $roster{'bob@jabber.org'}->{name}
-                                      - Name you stored in the roster
+    Roster()
 
-                  $roster{'bob@jabber.org'}->{subscription}
-                                      - Subscription status
-                                        (to, from, both, none)
+returns a L<Net::XMPP::Roster> object.  This will automatically
+intercept all of the roster and presence packets sent from
+the server and give you an accurate Roster.  For more
+information please read the man page for Net::XMPP::Roster.
 
-                  $roster{'bob@jabber.org'}->{ask}
-                                      - The ask status from this user
-                                        (subscribe, unsubscribe)
+=item RosterParse
 
-                  $roster{'bob@jabber.org'}->{groups}
-                                      - Array of groups that
-                                        bob@jabber.org is in
+    RosterParse(IQ object)
 
-    RosterGet() - sends an empty Net::XMPP::IQ::Roster tag to the
-                  server so the server will send the Roster to the
-                  client.  Returns the above hash from RosterParse.
+returns a hash that contains the roster
+parsed into the following data structure:
 
-    RosterRequest() - sends an empty Net::XMPP::IQ::Roster tag to the
-                      server so the server will send the Roster to the
-                      client.
+  $roster{'bob@jabber.org'}->{name}
+                      - Name you stored in the roster
 
-    RosterAdd(hash) - sends a packet asking that the jid be
-                      added to the roster.  The hash format
-                      is defined in the SetItem function
-                      in the Net::XMPP::Query jabber:iq:roster
-                      namespace.
+  $roster{'bob@jabber.org'}->{subscription}
+                      - Subscription status
+                        (to, from, both, none)
 
-    RosterRemove(hash) - sends a packet asking that the jid be
-                         removed from the roster.  The hash
-                         format is defined in the SetItem function
-                         in the Net::XMPP::Query jabber:iq:roster
-                         namespace.
+  $roster{'bob@jabber.org'}->{ask}
+                      - The ask status from this user
+                        (subscribe, unsubscribe)
+
+  $roster{'bob@jabber.org'}->{groups}
+                      - Array of groups that
+                        bob@jabber.org is in
+
+=item RosterGet
+
+  RosterGet()
+
+sends an empty Net::XMPP::IQ::Roster tag to the
+server so the server will send the Roster to the
+client.  Returns the above hash from RosterParse.
+
+=item RosterRequest
+
+  RosterRequest()
+
+sends an empty Net::XMPP::IQ::Roster tag to the
+server so the server will send the Roster to the
+client.
+
+=item RosterAdd
+
+    RosterAdd(hash)
+
+sends a packet asking that the jid be
+added to the roster.  The hash format
+is defined in the SetItem function
+in the Net::XMPP::Query jabber:iq:roster
+namespace.
+
+=item RosterRemove
+
+ RosterRemove(hash)
+
+sends a packet asking that the jid be
+removed from the roster.  The hash
+format is defined in the SetItem function
+in the Net::XMPP::Query jabber:iq:roster
+namespace.
+
+=back
 
 =head2 Roster DB Functions
 
-    RosterDB() - Tell the object to initialize the callbacks to
-                 automatically populate the Roster DB.  If you do this,
-                 then make sure that you call RosterRequest() instead of
-                 RosterGet() so that the callbacks can catch it and
-                 parse it.
+=over 4
 
-    RosterDBParse(IQ object) - If you want to manually control the
-                               database, then you can pass in all iq
-                               packets with jabber:iq:roster queries to
-                               this function.
+=item RosterDB
 
-    RosterDBAdd(jid,hash) - Add a new JID into the roster DB.  The JID
-                            is either a string, or a Net::XMPP::JID
-                            object.  The hash must be the same format as
-                            the has returned by RosterParse above, and
-                            is the actual hash, not a reference.
+    RosterDB()
 
-    RosterDBRemove(jid) - Remove a JID from the roster DB. The JID is
-                          either a string, or a Net::XMPP::JID object.
+Tell the object to initialize the callbacks to
+automatically populate the Roster DB.  If you do this,
+then make sure that you call RosterRequest() instead of
+RosterGet() so that the callbacks can catch it and
+parse it.
 
-    RosterDBClear() - Remove all JIDs from the roster DB.
+=item RosterDBParse
 
-    RosterDBExists(jid) - return 1 if the JID exists in the roster DB,
-                          undef otherwise.  The JID is either a string,
-                          or a Net::XMPP::JID object.
+    RosterDBParse(IQ object)
 
-    RosterDBJIDs() - returns a list of Net::XMPP::JID objects that
-                     represents all of the JIDs in the DB.
+If you want to manually control the
+database, then you can pass in all iq
+packets with jabber:iq:roster queries to
+this function.
 
-    RosterDBGroups() - returns the complete list of roster groups in the
-                       roster.
+=item RosterDBAdd
 
-    RosterDBGroupExists(group) - return 1 if the group is a group in the
-                                 roster DB, undef otherwise.
+  RosterDBAdd(jid,hash)
 
-    RosterDBGroupJIDs(group) - returns a list of Net::XMPP::JID objects
-                               that represents all of the JIDs in the
-                               specified roster group.
+Add a new JID into the roster DB.  The JID
+is either a string, or a Net::XMPP::JID
+object.  The hash must be the same format as
+the has returned by RosterParse above, and
+is the actual hash, not a reference.
 
-    RosterDBNonGroupJIDs() - returns a list of Net::XMPP::JID objects
-                             that represents all of the JIDs not in a
-                             roster group.
+=item RosterDBRemove
 
-    RosterDBQuery(jid) - returns a hash containing the data from the
-                         roster DB for the specified JID.  The JID is
-                         either a string, or a Net::XMPP::JID object.
-                         The hash format the same as in RosterParse
-                         above.
+  RosterDBRemove(jid)
 
-    RosterDBQuery(jid,key) - returns the entry from the above hash for
-                             the given key.  The available keys are:
-                               name, ask, subsrcription and groups
-                             The JID is either a string, or a
-                             Net::XMPP::JID object.
+Remove a JID from the roster DB. The JID is
+either a string, or a Net::XMPP::JID object.
 
+=item RosterDBClear
+
+Remove all JIDs from the roster DB.
+
+=item RosterDBExists
+
+ RosterDBExists(jid)
+
+return 1 if the JID exists in the roster DB,
+undef otherwise.  The JID is either a string,
+or a Net::XMPP::JID object.
+
+=item RosterDBJIDs
+
+  RosterDBJIDs()
+
+returns a list of Net::XMPP::JID objects that
+represents all of the JIDs in the DB.
+
+=item RosterDBGroups
+
+returns the complete list of roster groups in the
+roster.
+
+=item RosterDBGroupExists
+
+    RosterDBGroupExists(group)
+
+return 1 if the group is a group in the
+roster DB, undef otherwise.
+
+=item RosterDBGroupJIDs
+
+    RosterDBGroupJIDs(group)
+
+returns a list of Net::XMPP::JID objects
+that represents all of the JIDs in the
+specified roster group.
+
+=item RosterDBNonGroupJIDs
+
+returns a list of Net::XMPP::JID objects
+that represents all of the JIDs not in a
+roster group.
+
+=item RosterDBQuery
+
+  RosterDBQuery(jid)
+
+returns a hash containing the data from the
+roster DB for the specified JID.  The JID is
+either a string, or a Net::XMPP::JID object.
+The hash format the same as in RosterParse
+above.
+
+=item RosterDBQuery
+
+  RosterDBQuery(jid,key)
+
+returns the entry from the above hash for
+the given key.  The available keys are:
+  name, ask, subsrcription and groups
+The JID is either a string, or a
+L<Net::XMPP::JID> object.
+
+=back
 
 =head1 AUTHOR
 
