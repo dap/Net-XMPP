@@ -27,174 +27,222 @@ Net::XMPP - XMPP Perl Library
 
 =head1 SYNOPSIS
 
-  Net::XMPP provides a Perl user with access to the Extensible
-  Messaging and Presence Protocol (XMPP).
+Net::XMPP provides a Perl user with access to the Extensible
+Messaging and Presence Protocol (XMPP).
 
-  For more information about XMPP visit:
+For more information about XMPP visit:
 
-    http://www.xmpp.org
+L<http://www.xmpp.org>
 
 =head1 DESCRIPTION
 
-  Net::XMPP is a convenient tool to use for any perl script that would
-  like to utilize the XMPP Instant Messaging protocol.  While not a
-  client in and of itself, it provides all of the necessary back-end
-  functions to make a CGI client or command-line perl client feasible
-  and easy to use.  Net::XMPP is a wrapper around the rest of the
-  official Net::XMPP::xxxxxx packages.
+Net::XMPP is a convenient tool to use for any perl script that would
+like to utilize the XMPP Instant Messaging protocol.  While not a
+client in and of itself, it provides all of the necessary back-end
+functions to make a CGI client or command-line perl client feasible
+and easy to use.  Net::XMPP is a wrapper around the rest of the
+official Net::XMPP::xxxxxx packages.
 
-  There is are example scripts in the example directory that provide you
-  with examples of very simple XMPP programs.
+There is are example scripts in the example directory that provide you
+with examples of very simple XMPP programs.
 
 
-  NOTE: The parser that XML::Stream::Parser provides, as are most Perl
-  parsers, is synchronous.  If you are in the middle of parsing a packet
-  and call a user defined callback, the Parser is blocked until your
-  callback finishes.  This means you cannot be operating on a packet,
-  send out another packet and wait for a response to that packet.  It
-  will never get to you.  Threading might solve this, but as of this
-  writing threading in Perl is not quite up to par yet.  This issue will
-  be revisted in the future.
+NOTE: The parser that L<XML::Stream::Parser> provides, as are most Perl
+parsers, is synchronous.  If you are in the middle of parsing a packet
+and call a user defined callback, the Parser is blocked until your
+callback finishes.  This means you cannot be operating on a packet,
+send out another packet and wait for a response to that packet.  It
+will never get to you.  Threading might solve this, but as of this
+writing threading in Perl is not quite up to par yet.  This issue will
+be revisted in the future.
 
 
 =head1 EXAMPLES
 
-      use Net::XMPP;
-      my $client = Net::XMPP::Client->new();
+  use Net::XMPP;
+  my $client = Net::XMPP::Client->new();
 
 =head1 METHODS
 
-  The Net::XMPP module does not define any methods that you will call
-  directly in your code.  Instead you will instantiate objects that call
-  functions from this module to do work.  The three main objects that
-  you will work with are the Message, Presence, and IQ modules. Each one
-  corresponds to the Jabber equivilant and allows you get and set all
-  parts of those packets.
+The Net::XMPP module does not define any methods that you will call
+directly in your code.  Instead you will instantiate objects that call
+functions from this module to do work.  The three main objects that
+you will work with are the Message, Presence, and IQ modules. Each one
+corresponds to the Jabber equivilant and allows you get and set all
+parts of those packets.
 
-  There are a few functions that are the same across all of the objects:
+There are a few functions that are the same across all of the objects:
 
 =head2 Retrieval functions
 
-  GetXML() - returns the XML string that represents the data contained
-             in the object.
+=over 4
 
-             $xml  = $obj->GetXML();
+=item GetXML
 
-  GetChild()          - returns an array of Net::XMPP::Stanza objects
-  GetChild(namespace)   that represent all of the stanzas in the object
-                        that are namespaced.  If you specify a namespace
-                        then only stanza objects with that XMLNS are
-                        returned.
+Returns the XML string that represents the data contained
+in the object.
 
-                        @xObj = $obj->GetChild();
-                        @xObj = $obj->GetChild("my:namespace");
+  $xml  = $obj->GetXML();
 
-  GetTag() - return the root tag name of the packet.
+=item GetChild
 
-  GetTree() - return the XML::Stream::Node object that contains the data.
-              See XML::Stream::Node for methods you can call on this
-              object.
+Returns an array of L<Net::XMPP::Stanza> objects
+that represent all of the stanzas in the object
+that are namespaced.  If you specify a namespace
+then only stanza objects with that XMLNS are
+returned.
+
+  @xObj = $obj->GetChild();
+  @xObj = $obj->GetChild("my:namespace");
+
+=item GetTag
+
+Return the root tag name of the packet.
+
+=item GetTree
+
+Return the L<XML::Stream::Node> object that contains the data.
+See XML::Stream::Node for methods you can call on this
+object.
+
+=back
 
 =head2 Creation functions
 
-  NewChild(namespace)     - creates a new Net::XMPP::Stanza object with
-  NewChild(namespace,tag)   the specified namespace and root tag of
-                            whatever the namespace says its root tag
-                            should be.  Optionally you may specify
-                            another root tag if the default is not
-                            desired, or the namespace requres you to set
-                            one.
+=over 4
 
-                            $xObj = $obj->NewChild("my:namespace");
-                            $xObj = $obj->NewChild("my:namespace","foo");
-                              ie. <foo xmlns='my:namespace'...></foo>
+=item NewChild
 
-  InsertRawXML(string) - puts the specified string raw into the XML
-                         packet that you call this on.
+  NewChild(namespace)
+  NewChild(namespace,tag)
 
-                         $message->InsertRawXML("<foo></foo>")
-                           <message...>...<foo></foo></message>
+Creates a new Net::XMPP::Stanza object with
+the specified namespace and root tag of
+whatever the namespace says its root tag
+should be.  Optionally you may specify
+another root tag if the default is not
+desired, or the namespace requres you to set
+one.
 
-                         $x = $message->NewChild(..);
-                         $x->InsertRawXML("test");
+  $xObj = $obj->NewChild("my:namespace");
+  $xObj = $obj->NewChild("my:namespace","foo");
 
-                         $query = $iq->GetChild(..);
-                         $query->InsertRawXML("test");
+ie. <foo xmlns='my:namespace'...></foo>
 
-  ClearRawXML() - removes the raw XML from the packet.
+=item InsertRawXML
+
+  InsertRawXML(string)
+
+puts the specified string raw into the XML
+packet that you call this on.
+
+  $message->InsertRawXML("<foo></foo>")
+    <message...>...<foo></foo></message>
+
+  $x = $message->NewChild(..);
+  $x->InsertRawXML("test");
+
+  $query = $iq->GetChild(..);
+  $query->InsertRawXML("test");
+
+=item ClearRawXML
+
+  ClearRawXML()
+
+Removes the raw XML from the packet.
+
+=back
 
 =head2 Removal functions
 
-  RemoveChild()          - removes all of the namespaces child elements
-  RemoveChild(namespace)   from the object.  If a namespace is provided,
-                           then only the children with that namespace are
-                           removed.
+=over 4
+
+=item RemoveChild
+
+  RemoveChild()
+  RemoveChild(namespace)
+
+Removes all of the namespaces child elements
+from the object.  If a namespace is provided,
+then only the children with that namespace are
+removed.
+
+=back
 
 =head2 Test functions
 
-  DefinedChild()          - returns 1 if there are any known namespaced
-  DefinedChild(namespace)   stanzas in the packet, 0 otherwise.
-                            Optionally you can specify a namespace and
-                            determine if there are any stanzas with that
-                            namespace.
+=over 4
 
-                            $test = $obj->DefinedChild();
-                            $test = $obj->DefinedChild("my:namespace");
+=item DefinedChild
+
+  DefinedChild()
+  DefinedChild(namespace)
+
+Returns 1 if there are any known namespaced
+stanzas in the packet, 0 otherwise.
+Optionally you can specify a namespace and
+determine if there are any stanzas with that
+namespace.
+
+  $test = $obj->DefinedChild();
+  $test = $obj->DefinedChild("my:namespace");
+
+=back
 
 =head1 PACKAGES
 
-  For more information on each of these packages, please see the man page
-  for each one.
+For more information on each of these packages, please see the man page
+for each one.
 
 =head2 Net::XMPP::Client
 
-  This package contains the code needed to communicate with an XMPP
-  server: login, wait for messages, send messages, and logout.  It uses
-  XML::Stream to read the stream from the server and based on what kind
-  of tag it encounters it calls a function to handle the tag.
+This package contains the code needed to communicate with an XMPP
+server: login, wait for messages, send messages, and logout.  It uses
+XML::Stream to read the stream from the server and based on what kind
+of tag it encounters it calls a function to handle the tag.
 
 =head2 Net::XMPP::Protocol
 
-  A collection of high-level functions that Client uses to make their
-  lives easier.  These methods are inherited by the Client.
+A collection of high-level functions that Client uses to make their
+lives easier.  These methods are inherited by the Client.
 
 =head2 Net::XMPP::JID
 
-  The XMPP IDs consist of three parts: user id, server, and resource.
-  This module gives you access to those components without having to
-  parse the string yourself.
+The XMPP IDs consist of three parts: user id, server, and resource.
+This module gives you access to those components without having to
+parse the string yourself.
 
 =head2 Net::XMPP::Message
 
-  Everything needed to create and read a <message/> received from the
-  server.
+Everything needed to create and read a <message/> received from the
+server.
 
 =head2 Net::XMPP::Presence
 
-  Everything needed to create and read a <presence/> received from the
-  server.
+Everything needed to create and read a <presence/> received from the
+server.
 
 =head2 Net::XMPP::IQ
 
-  IQ is a wrapper around a number of modules that provide support for
-  the various Info/Query namespaces that XMPP recognizes.
+IQ is a wrapper around a number of modules that provide support for
+the various Info/Query namespaces that XMPP recognizes.
 
 =head2 Net::XMPP::Stanza
 
-  This module represents a namespaced stanza that is used to extend a
-  <message/>, <presence/>, and <iq/>.
+This module represents a namespaced stanza that is used to extend a
+<message/>, <presence/>, and <iq/>.
 
-  The man page for Net::XMPP::Stanza contains a listing of all supported
-  namespaces, and the methods that are supported by the objects that
-  represent those namespaces.
+The man page for Net::XMPP::Stanza contains a listing of all supported
+namespaces, and the methods that are supported by the objects that
+represent those namespaces.
 
 =head2 Net::XMPP::Namespaces
 
-  XMPP allows for any stanza to be extended by any bit of XML.  This
-  module contains all of the internals for defining the XMPP based
-  extensions defined by the IETF.  The documentation for this module
-  explains more about how to add your own custom namespace and have it
-  be supported.
+XMPP allows for any stanza to be extended by any bit of XML.  This
+module contains all of the internals for defining the XMPP based
+extensions defined by the IETF.  The documentation for this module
+explains more about how to add your own custom namespace and have it
+be supported.
 
 =head1 AUTHOR
 
