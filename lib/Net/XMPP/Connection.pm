@@ -54,6 +54,8 @@ under the LGPL 2.1.
 use strict;
 use Carp;
 
+use Scalar::Util qw(weaken);
+
 use XML::Stream;
 use Net::XMPP::Debug;
 use Net::XMPP::Protocol;
@@ -106,7 +108,7 @@ sub init
 
     $self->{STREAM} =
         XML::Stream->new(style      => "node",
-                        debugfh    => $self->{DEBUG}->GetHandle(),
+                        debugfh    => weaken $self->{DEBUG}->GetHandle(),
                         debuglevel => $self->{DEBUG}->GetLevel(),
                         debugtime  => $self->{DEBUG}->GetTime(),
                        );
@@ -114,6 +116,9 @@ sub init
     $self->{RCVDB}->{currentID} = 0;
 
     $self->InitCallbacks();
+
+    weaken $self->{STREAM};
+    weaken $self->{CB} if $self->{CB};
 
     return $self;
 }

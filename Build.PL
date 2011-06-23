@@ -24,6 +24,7 @@ my $build = Module::Build->new(
 		'Authen::SASL' => '2.12',
 		'Digest::SHA1' => '1.02',
 		'XML::Stream'  => '1.23_04',
+		'Scalar::Util' => '0',
 	},
 
 	sign               => 1,
