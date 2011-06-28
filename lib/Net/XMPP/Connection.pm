@@ -108,7 +108,8 @@ sub init
 
     $self->{STREAM} =
         XML::Stream->new(style      => "node",
-                        debugfh    => weaken $self->{DEBUG}->GetHandle(),
+                        debugfh    => $self->{DEBUG}->GetHandle(),
+                        #debugfh    => weaken $self->{DEBUG}->GetHandle(),
                         debuglevel => $self->{DEBUG}->GetLevel(),
                         debugtime  => $self->{DEBUG}->GetTime(),
                        );
