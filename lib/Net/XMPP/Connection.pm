@@ -121,7 +121,7 @@ sub init
 
     $self->InitCallbacks();
 
-    weaken $self->{STREAM};
+#    weaken $self->{STREAM};
     weaken $self->{CB} if $self->{CB};
 
     return $self;
