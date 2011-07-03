@@ -219,7 +219,7 @@ use strict;
 use warnings;
 
 use Carp;
-use XML::Stream 1.22 qw( Node );
+use XML::Stream qw( Node );
 use Net::XMPP::JID;
 use Net::XMPP::Debug;
 use Net::XMPP::Namespaces;
