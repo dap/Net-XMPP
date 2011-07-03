@@ -152,8 +152,9 @@ under the LGPL 2.1.
 
 =cut
 
-require 5.003;
+require 5.008;
 use strict;
+use warnings;
 use FileHandle;
 use Carp;
 use vars qw( %HANDLES $DEFAULT $DEFAULTLEVEL $DEFAULTTIME $AUTOLOAD );

@@ -1046,18 +1046,24 @@ under the LGPL 2.1.
 
 =cut
 
+require 5.003;
+use strict;
+use warnings;
+
+use Carp;
 use Digest::SHA1;
 use MIME::Base64;
 use Authen::SASL;
+
 use XML::Stream;
+
 use Net::XMPP::IQ;
 use Net::XMPP::Message;
 use Net::XMPP::Presence;
 use Net::XMPP::JID;
 use Net::XMPP::Roster;
 use Net::XMPP::PrivacyLists;
-use strict;
-use Carp;
+
 use vars qw( %XMLNS %NEWOBJECT $SASL_CALLBACK $TLS_CALLBACK );
 
 ##############################################################################
