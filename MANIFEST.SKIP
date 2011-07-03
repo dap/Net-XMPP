@@ -1,5 +1,5 @@
 
-#!start included /home/dapatrick/perl5/lib/perl5/ExtUtils/MANIFEST.SKIP
+#!start included /usr/share/perl/5.10/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -32,7 +32,7 @@
 
 # Avoid Devel::Cover files.
 \bcover_db\b
-#!end included /home/dapatrick/perl5/lib/perl5/ExtUtils/MANIFEST.SKIP
+#!end included /usr/share/perl/5.10/ExtUtils/MANIFEST.SKIP
 
 # Avoid configuration metadata file
 ^MYMETA\.
@@ -48,6 +48,3 @@
 
 # Avoid archives of this distribution
 \bNet-XMPP-[\d\.\_]+
-
-# Avoid test credential file
-\bt/config/accounts.yml$
