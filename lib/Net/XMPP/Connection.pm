@@ -183,7 +183,9 @@ sub Connect
     {
         $self->{DEBUG}->Log1("Connect: connection made");
 
-        $self->{STREAM}->SetCallBacks(node=>sub{ $self->CallBack(@_) });
+        my $weak = $self;
+        weaken $weak;
+        $self->{STREAM}->SetCallBacks(node=>sub{ $weak->CallBack(@_) });
         $self->{CONNECTED} = 1;
         $self->{RECONNECTING} = 0;
 
