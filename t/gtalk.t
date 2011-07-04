@@ -3,12 +3,34 @@ use warnings;
 
 use Test::More;
 
+#{
+#   package XML::Stream;
+#   our $AUTOLOAD;
+#   use Data::Dumper;
+#
+#   sub new {
+#       bless {}, shift;
+#   }
+##  sub Connect {
+##  }
+##  sub GetErrorCode {
+##  }
+##
+#   AUTOLOAD {
+#       print Dumper [$AUTOLOAD, \@_];
+#   }
+#
+#}
+#$INC{'XML/Stream.pm'} = 1;
+
+
+
 
 plan tests => 1;
 
 # TODO ask user if it is ok to do network tests!
 
-use Net::XMPP;
+require Net::XMPP;
 # see
 # http://blogs.perl.org/users/marco_fontani/2010/03/google-talk-with-perl.html
 {
@@ -49,6 +71,13 @@ my $status = $conn->Connect(
 # if (not defined $status) {
 # details => $!, 
 # }
+#use Data::Dumper;
+#die Dumper \%INC;
+#foreach my $k (keys %INC) {
+#    if ($k =~ /XML/) {
+#       diag $k;
+#    }
+#}
 
 __END__
 
