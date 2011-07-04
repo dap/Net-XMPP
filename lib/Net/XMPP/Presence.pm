@@ -381,7 +381,7 @@ sub new
     return $self;
 }
 
-sub _presence { my $self = shift; return Net::XMPP::Presence->new(); }
+sub _presence { return Net::XMPP::Presence->new(); }
 
 
 $FUNCTIONS{Error}->{path} = 'error/text()';
