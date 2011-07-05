@@ -26,9 +26,15 @@ use Test::More;
 
 eval "use Test::Memory::Cycle";
 my $memory_cycle = ! $@;
+my $leak_guard;
+
+BEGIN {
+    eval "use Devel::LeakGuard::Object qw(leakguard)";
+    $leak_guard = ! $@;
+}
 
 my $repeat = 10;
-plan tests => 2 + 3 * $repeat;
+plan tests => 3 + 3 * ($repeat + 1);
 
 # TODO ask user if it is ok to do network tests!
 print_size('before loading Net::XMPP');
@@ -64,6 +70,17 @@ my $mem_last = $mem1;
 for (2..$repeat) {
     $mem_last = run();
 }
+SKIP: {
+    skip 'Devel::LeakGuard::Object is needed', 1 if not $leak_guard;
+    my $warn;
+    local $SIG{__WARN__} = sub { $warn = shift };
+    leakguard {
+         run();
+    };
+
+    ok(!$warn, 'leaking') or diag $warn;
+}
+
 
 # as I can see setting up the connection leaks in the first 5 attempts 
 # and then it stops leaking. I tried it with repeate=25
@@ -133,8 +150,6 @@ sub run {
             resource => 'notify v1.0',
         );
         is $res, 'ok', 'result is ok';
-#diag $res;
-#diag $msg;
         if (not defined $res or $res ne 'ok') {
            diag $!;
         }
@@ -142,6 +157,7 @@ sub run {
 
     return print_size('after calling Run');
 }
+
 sub print_size {
     my ($msg) = @_;
     return 0 if not -x '/bin/ps';
