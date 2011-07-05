@@ -105,7 +105,10 @@ for (2..$repeat) {
 # as I can see setting up the connection leaks in the first 5 attempts 
 # and then it stops leaking. I tried it with repeate=25
 # When adding AuthSend to the mix the code keeps leaking even after 20 repeats.
-# Still the total leak is only 130 in 25 repeats 
+# Still the total leak is only 130 in 25 repeats
+# After duplicating the connections (having two users),
+# adding the CallBacks and handling the presence messages.
+# the leak after 25 repeats went up to 152.
 #
 # This might need to be added to a test case.
 # For now we only check if it "does not leak too much"
@@ -114,7 +117,7 @@ TODO: {
    local $TODO = 'Memory leak or expectations being to high?';
    is $mem_last, $mem1, 'expected 0 memory growth';
 }
-cmp_ok $mem_last, '<', $mem1+140, 'does not leak much' or diag 'Leak: ' . ($mem_last-$mem1);
+cmp_ok $mem_last, '<', $mem1+160, 'does not leak much' or diag 'Leak: ' . ($mem_last-$mem1);
 
 
 # tools when XML::Stream mocking
@@ -163,9 +166,20 @@ sub run {
             if (not defined $res or $res ne 'ok') {
                diag $!;
             }
+
+            $conn[$i]->SetCallBacks(
+                message => \&on_message,
+                presence => \&on_presence,
+                receive  => \&on_receive,
+            );
+            $conn[$i]->PresenceSend();
         }
     }
 
+    for my $i (0..5) {
+        my $status = $conn[$i % 2]->Process(1);
+        die if not defined $status;
+    }
     # receive presence message
     # send and receive messages
 
@@ -184,5 +198,35 @@ sub print_size {
         $RSS = $rss;
     }
     return $RSS;
+}
+
+sub on_presence {
+    my ($sid, $presence) = @_;
+    my $to = $presence->GetTo;
+    my $from = $presence->GetFrom;
+    my $type = $presence->GetType || 'available';
+    my $status = $presence->GetStatus || '';
+
+    ($to)   = split m{/}, $to;
+    ($from) = split m{/}, $from;
+
+    diag "$to - $from - $type - $status";
+}
+
+sub on_receive {
+    # called on every message received
+}
+
+sub on_message {
+    my ($message) = @_;
+    my $type     = $message->GetType;
+    my $fromJID  = $message->fromJID('jid');
+    my $from     = $message->GetUserID;
+    my $resource = $message->GetResource;
+    my $subject  = $message->GetSubject;
+    my $body     = $message->GetBody;
+    my $xml      = $message->GetXML;
+
+    diag "$from - $body";
 }
 
