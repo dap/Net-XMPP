@@ -24,9 +24,11 @@ use Test::More;
 #$INC{'XML/Stream.pm'} = 1;
 
 
+eval "use Test::Memory::Cycle";
+my $memory_cycle = ! $@;
 
 
-plan tests => 1;
+plan tests => 2;
 
 # TODO ask user if it is ok to do network tests!
 
@@ -67,6 +69,11 @@ my $status = $conn->Connect(
 	tls            => 1,
 	ssl_verify     => 0,
 );
+
+SKIP: {
+    skip 'Needs Test::Memory::Cycle', 1 if not $memory_cycle; 
+    memory_cycle_ok($conn, 'after calling Connect');
+}
 
 # if (not defined $status) {
 # details => $!, 
