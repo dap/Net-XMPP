@@ -31,6 +31,17 @@ use Test::More;
 #$INC{'XML/Stream.pm'} = 1;
 ######################## XML::Stream mocking ends
 
+my @users;
+foreach my $name (qw(GTALK0 GTALK1)) {
+    if ($ENV{$name}) {
+        my ($user, $pw) = split /:/, $ENV{$name};
+        push @users, {
+              username => $user,
+              password => $pw,
+        };
+    }
+}
+
 eval "use Test::Memory::Cycle";
 my $memory_cycle = ! $@;
 my $leak_guard;
@@ -41,7 +52,7 @@ BEGIN {
 }
 
 my $repeat = 5;
-plan tests => 3 + 3 * ($repeat + 1);
+plan tests => 2 + 6 * $repeat;
 
 # TODO ask user if it is ok to do network tests!
 print_size('before loading Net::XMPP');
@@ -121,49 +132,42 @@ exit;
 
 
 sub run {
-    my $conn   = Net::XMPP::Client->new;
-    isa_ok $conn, 'Net::XMPP::Client';
+    my @conn;
+    for my $i (0,1) {
+        $conn[$i]   = Net::XMPP::Client->new;
+        isa_ok $conn[$i], 'Net::XMPP::Client';
 
-    my $status = $conn->Connect(
-        hostname       => 'talk.google.com',
-        port           => 5222,
-        componentname  => 'gmail.com',
-        connectiontype => 'tcpip',
-        tls            => 1,
-        ssl_verify     => 0,
-    );
-
-    SKIP: {
-        skip 'Needs Test::Memory::Cycle', 1 if not $memory_cycle; 
-        memory_cycle_ok($conn, 'after calling Connect');
-    }
-
-    #return print_size('after calling Connect');
-
-
-    my @users;
-    foreach my $name (qw(GTALK1 GTALK2)) {
-        if ($ENV{$name}) {
-            my ($user, $pw) = split /:/, $ENV{$name};
-            push @users, {
-                  username => $user,
-                  password => $pw,
-            };
-        }
-    }
-    SKIP: {
-        skip 'need GTALK1 = username:password', 1 if not @users;
-
-        my ( $res, $msg ) = $conn->AuthSend(
-            username => $users[0]{username},
-            password => $users[0]{password},
-            resource => 'notify v1.0',
+        my $status = $conn[$i]->Connect(
+            hostname       => 'talk.google.com',
+            port           => 5222,
+            componentname  => 'gmail.com',
+            connectiontype => 'tcpip',
+            tls            => 1,
+            ssl_verify     => 0,
         );
-        is $res, 'ok', 'result is ok';
-        if (not defined $res or $res ne 'ok') {
-           diag $!;
+
+        SKIP: {
+            skip 'Needs Test::Memory::Cycle', 1 if not $memory_cycle; 
+            memory_cycle_ok($conn[$i], 'after calling Connect');
+        }
+
+        SKIP: {
+            skip "need GTALK$i = username:password", 1 if not $users[$i];
+
+            my ( $res, $msg ) = $conn[$i]->AuthSend(
+                username => $users[$i]{username},
+                password => $users[$i]{password},
+                resource => 'notify v1.0',
+            );
+            is $res, 'ok', 'result is ok';
+            if (not defined $res or $res ne 'ok') {
+               diag $!;
+            }
         }
     }
+
+    # receive presence message
+    # send and receive messages
 
     return print_size('after calling Run');
 }
