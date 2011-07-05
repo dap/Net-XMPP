@@ -28,7 +28,7 @@ eval "use Test::Memory::Cycle";
 my $memory_cycle = ! $@;
 
 my $repeat = 5;
-plan tests => 1 + 2 * $repeat;
+plan tests => 2 + 2 * $repeat;
 
 # TODO ask user if it is ok to do network tests!
 print_size('before loading Net::XMPP');
@@ -64,10 +64,31 @@ my $mem_last = $mem1;
 for (2..$repeat) {
     $mem_last = run();
 }
+
+# as I can see setting up the connection leaks in the first 5 attempts 
+# and then it stops leaking
+# this might need to be added to a test case.
+# For now we only check if it "does not leak too much"
 TODO: {
    local $TODO = 'Memory leak or expectations being to high?';
    is $mem_last, $mem1, 'expected 0 memory growth';
 }
+cmp_ok $mem_last, '<', $mem1+100, 'does not leak much';
+
+
+# if (not defined $status) {
+# details => $!, 
+# }
+#use Data::Dumper;
+#die Dumper \%INC;
+#foreach my $k (keys %INC) {
+#    if ($k =~ /XML/) {
+#       diag $k;
+#    }
+#}
+
+exit;
+
 
 
 sub run {
@@ -91,16 +112,6 @@ sub run {
     return print_size('after calling Connect');
 }
 
-# if (not defined $status) {
-# details => $!, 
-# }
-#use Data::Dumper;
-#die Dumper \%INC;
-#foreach my $k (keys %INC) {
-#    if ($k =~ /XML/) {
-#       diag $k;
-#    }
-#}
 
 #my ($username, $password) = ($ENV{GTALK_USER}, $ENV{GTALK_PW});
 #SKIP: {
