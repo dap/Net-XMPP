@@ -27,8 +27,8 @@ use Test::More;
 eval "use Test::Memory::Cycle";
 my $memory_cycle = ! $@;
 
-my $repeat = 5;
-plan tests => 2 + 2 * $repeat;
+my $repeat = 10;
+plan tests => 2 + 3 * $repeat;
 
 # TODO ask user if it is ok to do network tests!
 print_size('before loading Net::XMPP');
@@ -66,14 +66,16 @@ for (2..$repeat) {
 }
 
 # as I can see setting up the connection leaks in the first 5 attempts 
-# and then it stops leaking
-# this might need to be added to a test case.
+# and then it stops leaking. I tried it with repeate=25
+# When adding AuthSend to the mix the code keeps leaking even after 20 repeats.
+#
+# This might need to be added to a test case.
 # For now we only check if it "does not leak too much"
 TODO: {
    local $TODO = 'Memory leak or expectations being to high?';
    is $mem_last, $mem1, 'expected 0 memory growth';
 }
-cmp_ok $mem_last, '<', $mem1+100, 'does not leak much';
+cmp_ok $mem_last, '<', $mem1+80, 'does not leak much';
 
 
 # if (not defined $status) {
@@ -109,23 +111,37 @@ sub run {
         memory_cycle_ok($conn, 'after calling Connect');
     }
 
-    return print_size('after calling Connect');
+    #return print_size('after calling Connect');
+
+
+    my @users;
+    foreach my $name (qw(GTALK1 GTALK2)) {
+        if ($ENV{$name}) {
+            my ($user, $pw) = split /:/, $ENV{$name};
+            push @users, {
+                  username => $user,
+                  password => $pw,
+            };
+        }
+    }
+    SKIP: {
+        skip 'need GTALK1 = username:password', 1 if not @users;
+
+        my ( $res, $msg ) = $conn->AuthSend(
+            username => $users[0]{username},
+            password => $users[0]{password},
+            resource => 'notify v1.0',
+        );
+        is $res, 'ok', 'result is ok';
+#diag $res;
+#diag $msg;
+        if (not defined $res or $res ne 'ok') {
+           diag $!;
+        }
+    }
+
+    return print_size('after calling Run');
 }
-
-
-#my ($username, $password) = ($ENV{GTALK_USER}, $ENV{GTALK_PW});
-#SKIP: {
-#    skip => 'need GTALK_USER and GTALK_PW', 1 if (not $username or not $password);
-#
-#	my ( $res, $msg ) = $conn->AuthSend(
-#		username => $username,
-#		password => $password,
-#		resource => 'notify v1.0',
-#	);
-#	if (not defined $res or $res ne 'ok') {
-#			$!),
-#	}
-
 sub print_size {
     my ($msg) = @_;
     return 0 if not -x '/bin/ps';
