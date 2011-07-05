@@ -27,12 +27,13 @@ use Test::More;
 eval "use Test::Memory::Cycle";
 my $memory_cycle = ! $@;
 
-
-plan tests => 2;
+my $repeat = 5;
+plan tests => 1 + 2 * $repeat;
 
 # TODO ask user if it is ok to do network tests!
-
+print_size('before loading Net::XMPP');
 require Net::XMPP;
+print_size('after loading Net::XMPP');
 # see
 # http://blogs.perl.org/users/marco_fontani/2010/03/google-talk-with-perl.html
 {
@@ -58,21 +59,36 @@ require Net::XMPP;
   }
 }
 
-my $conn   = Net::XMPP::Client->new;
-isa_ok $conn, 'Net::XMPP::Client';
+my $mem1 = run();
+my $mem_last = $mem1;
+for (2..$repeat) {
+    $mem_last = run();
+}
+TODO: {
+   local $TODO = 'Memory leak or expectations being to high?';
+   is $mem_last, $mem1, 'expected 0 memory growth';
+}
 
-my $status = $conn->Connect(
-	hostname       => 'talk.google.com',
-	port           => 5222,
-	componentname  => 'gmail.com',
-	connectiontype => 'tcpip',
-	tls            => 1,
-	ssl_verify     => 0,
-);
 
-SKIP: {
-    skip 'Needs Test::Memory::Cycle', 1 if not $memory_cycle; 
-    memory_cycle_ok($conn, 'after calling Connect');
+sub run {
+    my $conn   = Net::XMPP::Client->new;
+    isa_ok $conn, 'Net::XMPP::Client';
+
+    my $status = $conn->Connect(
+        hostname       => 'talk.google.com',
+        port           => 5222,
+        componentname  => 'gmail.com',
+        connectiontype => 'tcpip',
+        tls            => 1,
+        ssl_verify     => 0,
+    );
+
+    SKIP: {
+        skip 'Needs Test::Memory::Cycle', 1 if not $memory_cycle; 
+        memory_cycle_ok($conn, 'after calling Connect');
+    }
+
+    return print_size('after calling Connect');
 }
 
 # if (not defined $status) {
@@ -86,18 +102,30 @@ SKIP: {
 #    }
 #}
 
-__END__
+#my ($username, $password) = ($ENV{GTALK_USER}, $ENV{GTALK_PW});
+#SKIP: {
+#    skip => 'need GTALK_USER and GTALK_PW', 1 if (not $username or not $password);
+#
+#	my ( $res, $msg ) = $conn->AuthSend(
+#		username => $username,
+#		password => $password,
+#		resource => 'notify v1.0',
+#	);
+#	if (not defined $res or $res ne 'ok') {
+#			$!),
+#	}
 
-my ($username, $password) = ($ENV{GTALK_USER}, $ENV{GTALK_PW});
-SKIP: {
-    skip => 'need GTALK_USER and GTALK_PW', 1 if (not $username or not $password);
-
-	my ( $res, $msg ) = $conn->AuthSend(
-		username => $username,
-		password => $password,
-		resource => 'notify v1.0',
-	);
-	if (not defined $res or $res ne 'ok') {
-			$!),
-	}
+sub print_size {
+    my ($msg) = @_;
+    return 0 if not -x '/bin/ps';
+    my @lines = grep { /^$$\s/ } qx{/bin/ps -e -o pid,rss,command};
+    chomp @lines;
+    my $RSS;
+    foreach my $line (@lines) {
+        my ($pid, $rss) = split /\s+/, $line;
+        diag "RSS: $rss   - $msg";
+        $RSS = $rss;
+    }
+    return $RSS;
+}
 
