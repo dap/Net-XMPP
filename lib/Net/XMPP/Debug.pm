@@ -40,9 +40,10 @@ what is logged.
 
     $Debug = Net::XMPP::Debug->new();
 
-    $Debug->Init(level=>2,
-	             file=>"stdout",
-  	             header=>"MyScript");
+    $Debug->Init(
+           level  => 2,
+	   file   => "stdout",
+	   header =>"MyScript");
 
     $Debug->Log0("Connection established");
 
@@ -62,15 +63,17 @@ below for the valid settings.
 
 =item Init
 
-    Init(level=>integer, 
-         file=>string,   
-         header=>string, 
-         setdefault=>0|1,
-         usedefault=>0|1,
-         time=>0|1)      
+    Init(
+         level      => integer,
+         file       => string,
+         header     => string,
+         setdefault => 0|1,
+         usedefault => 0|1,
+         time       => 0|1)
 
-initializes the debug object.  The level
-determines the maximum level of debug
+initializes the debug object.
+
+The B<level> determines the maximum level of debug
 messages to log:
 
   0 - Base level Output (default)
@@ -79,21 +82,24 @@ messages to log:
   ...
   N - Whatever you want....
 
-The file determines where the debug log
+The B<file> determines where the debug log
 goes.  You can either specify a path to
 a file, or "stdout" (the default).  "stdout"
 tells Debug to send all of the debug info
 sent to this object to go to stdout.
-header is a string that will preappended
+
+B<header> is a string that will preappended
 to the beginning of all log entries.  This
 makes it easier to see what generated the
 log entry (default is "Debug").
-setdefault saves the current filehandle
+
+B<setdefault> saves the current filehandle
 and makes it available for other Debug
 objects to use.  To use the default set
-usedefault to 1.  The time parameter
-specifies whether or not to add a timestamp
-to the beginning of each logged line.
+B<usedefault> to 1.
+
+The B<time> parameter specifies whether or not to add a
+timestamp to the beginning of each logged line.
 
 =item LogN
 
@@ -118,7 +124,7 @@ way.  (ie... Log0, Log2, Log100, etc...)
   $hash{a} = "atest";
   $hash{b} = "btest";
 
-  $Debug->Log1("hashtest",\%hash);
+  $Debug->Log1("hashtest", \%hash);
 
 You would get the following log:
 
@@ -146,8 +152,9 @@ under the LGPL 2.1.
 
 =cut
 
-require 5.003;
+require 5.008;
 use strict;
+use warnings;
 use FileHandle;
 use Carp;
 use vars qw( %HANDLES $DEFAULT $DEFAULTLEVEL $DEFAULTTIME $AUTOLOAD );
@@ -195,21 +202,46 @@ sub Init
     {
         $self->{LEVEL} = 0;
         $self->{LEVEL} = $args{level} if exists($args{level});
-
-        $self->{HANDLE} = FileHandle->new(">&STDERR");
-        $self->{HANDLE}->autoflush(1);
-        if (exists($args{file}))
+        if ($self->{LEVEL} >= 0)
         {
-            if (exists($Net::XMPP::Debug::HANDLES{$args{file}}))
+
+            $self->{HANDLE} = FileHandle->new(">&STDERR");
+            $self->{HANDLE}->autoflush(1);
+            if (exists($args{file}))
             {
-                $self->{HANDLE} = $Net::XMPP::Debug::HANDLES{$args{file}};
-                $self->{HANDLE}->autoflush(1);
-            }
-            else
-            {
-                if (-e $args{file})
+                if (exists($Net::XMPP::Debug::HANDLES{$args{file}}))
                 {
-                    if (-w $args{file})
+                    $self->{HANDLE} = $Net::XMPP::Debug::HANDLES{$args{file}};
+                    $self->{HANDLE}->autoflush(1);
+                }
+                else
+                {
+                    if (-e $args{file})
+                    {
+                        if (-w $args{file})
+                        {
+                            $self->{HANDLE} = FileHandle->new(">$args{file}");
+                            if (defined($self->{HANDLE}))
+                            {
+                                $self->{HANDLE}->autoflush(1);
+                                $Net::XMPP::Debug::HANDLES{$args{file}} = $self->{HANDLE};
+                            }
+                            else
+                            {
+                                print STDERR "ERROR: Debug filehandle could not be opened.\n";
+                                print STDERR"        Debugging disabled.\n";
+                                print STDERR "       ($!)\n";
+                                $self->{LEVEL} = -1;
+                            }
+                        }
+                        else
+                        {
+                            print STDERR "ERROR: You do not have permission to write to $args{file}.\n";
+                            print STDERR"        Debugging disabled.\n";
+                            $self->{LEVEL} = -1;
+                        }
+                    }
+                    else
                     {
                         $self->{HANDLE} = FileHandle->new(">$args{file}");
                         if (defined($self->{HANDLE}))
@@ -224,28 +256,6 @@ sub Init
                             print STDERR "       ($!)\n";
                             $self->{LEVEL} = -1;
                         }
-                    }
-                    else
-                    {
-                        print STDERR "ERROR: You do not have permission to write to $args{file}.\n";
-                        print STDERR"        Debugging disabled.\n";
-                        $self->{LEVEL} = -1;
-                    }
-                }
-                else
-                {
-                    $self->{HANDLE} = FileHandle->new(">$args{file}");
-                    if (defined($self->{HANDLE}))
-                    {
-                        $self->{HANDLE}->autoflush(1);
-                        $Net::XMPP::Debug::HANDLES{$args{file}} = $self->{HANDLE};
-                    }
-                    else
-                    {
-                        print STDERR "ERROR: Debug filehandle could not be opened.\n";
-                        print STDERR"        Debugging disabled.\n";
-                        print STDERR "       ($!)\n";
-                        $self->{LEVEL} = -1;
                     }
                 }
             }
@@ -275,6 +285,7 @@ sub Log
 
     my $fh = $self->{HANDLE};
     $fh = $Net::XMPP::Debug::DEFAULT if exists($self->{USEDEFAULT});
+    return if not $fh;
 
     my $string = "";
 

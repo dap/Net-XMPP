@@ -1,3 +1,5 @@
+  - Remove old copy of Test::More (szabgab)
+
 1.02_03 2011-06-23
 ===
   - RT#61611 Correct comparison operator

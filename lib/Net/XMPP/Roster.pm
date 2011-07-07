@@ -277,10 +277,15 @@ under the LGPL 2.1.
 
 =cut
 
+use 5.008;
 use strict;
+use warnings;
+
 use Carp;
 
 use Net::XMPP::JID;
+
+use Scalar::Util qw(weaken);
 
 sub new
 {
@@ -315,8 +320,10 @@ sub init
 {
     my $self = shift;
 
-    $self->{CONNECTION}-> SetXPathCallBacks('/iq[@type="result" or @type="set"]/query[@xmlns="jabber:iq:roster"]'=>sub{ $self->handler(@_) });
-    $self->{CONNECTION}-> SetXPathCallBacks('/presence'=>sub{ $self->handler(@_) });
+    my $weak = $self;
+    weaken $weak;
+    $self->{CONNECTION}-> SetXPathCallBacks('/iq[@type="result" or @type="set"]/query[@xmlns="jabber:iq:roster"]'=>sub{ $weak->handler(@_) });
+    $self->{CONNECTION}-> SetXPathCallBacks('/presence'=>sub{ $weak->handler(@_) });
 }
 
 

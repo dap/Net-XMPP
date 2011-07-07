@@ -247,7 +247,9 @@ under the LGPL 2.1.
 
 =cut
 
+require 5.008;
 use strict;
+use warnings;
 use Carp;
 use Net::XMPP::Connection;
 use base qw( Net::XMPP::Connection );
