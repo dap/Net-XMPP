@@ -267,8 +267,9 @@ under the LGPL 2.1.
 
 =cut
 
-require 5.005;
+require 5.008;
 use strict;
+use warnings;
 use Time::Local;
 use POSIX;
 use vars qw( $AUTOLOAD $VERSION $PARSING );

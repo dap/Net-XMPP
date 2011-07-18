@@ -1046,18 +1046,24 @@ under the LGPL 2.1.
 
 =cut
 
+require 5.003;
+use strict;
+use warnings;
+
+use Carp;
 use Digest::SHA1;
 use MIME::Base64;
 use Authen::SASL;
+
 use XML::Stream;
+
 use Net::XMPP::IQ;
 use Net::XMPP::Message;
 use Net::XMPP::Presence;
 use Net::XMPP::JID;
 use Net::XMPP::Roster;
 use Net::XMPP::PrivacyLists;
-use strict;
-use Carp;
+
 use vars qw( %XMLNS %NEWOBJECT $SASL_CALLBACK $TLS_CALLBACK );
 
 ##############################################################################
@@ -3427,15 +3433,17 @@ sub xmppCallbackInit
 
     $self->{DEBUG}->Log1("xmppCallbackInit: start");
 
-    $self->SetCallBacks(iq=>sub{ $self->callbackIQ(@_) },
-                        presence=>sub{ $self->callbackPresence(@_) },
-                        message=>sub{ $self->callbackMessage(@_) },
+    my $weak = $self;
+    weaken $weak;
+    $self->SetCallBacks(iq=>sub{ $weak->callbackIQ(@_) },
+                        presence=>sub{ $weak->callbackPresence(@_) },
+                        message=>sub{ $weak->callbackMessage(@_) },
                         );
 
-    $self->SetPresenceCallBacks(subscribe=>sub{ $self->callbackPresenceSubscribe(@_) },
-                                unsubscribe=>sub{ $self->callbackPresenceUnsubscribe(@_) },
-                                subscribed=>sub{ $self->callbackPresenceSubscribed(@_) },
-                                unsubscribed=>sub{ $self->callbackPresenceUnsubscribed(@_) },
+    $self->SetPresenceCallBacks(subscribe=>sub{ $weak->callbackPresenceSubscribe(@_) },
+                                unsubscribe=>sub{ $weak->callbackPresenceUnsubscribe(@_) },
+                                subscribed=>sub{ $weak->callbackPresenceSubscribed(@_) },
+                                unsubscribed=>sub{ $weak->callbackPresenceUnsubscribed(@_) },
                                );
 
     $self->TLSInit();

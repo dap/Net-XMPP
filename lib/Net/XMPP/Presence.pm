@@ -354,8 +354,10 @@ under the LGPL 2.1.
 
 =cut
 
-require 5.003;
+require 5.008;
 use strict;
+use warnings;
+
 use Carp;
 use vars qw( %FUNCTIONS );
 use Net::XMPP::Stanza;
@@ -379,7 +381,7 @@ sub new
     return $self;
 }
 
-sub _presence { my $self = shift; return Net::XMPP::Presence->new(); }
+sub _presence { return Net::XMPP::Presence->new(); }
 
 
 $FUNCTIONS{Error}->{path} = 'error/text()';

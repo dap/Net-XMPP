@@ -313,6 +313,10 @@ under the LGPL 2.1.
 
 =cut
 
+require 5.008;
+use strict;
+use warnings;
+
 use vars qw ( %NS %SKIPNS );
 
 $SKIPNS{'__netxmpp__'} = 1;

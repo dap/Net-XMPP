@@ -51,12 +51,15 @@ under the LGPL 2.1.
 
 =cut
 
+require 5.008;
 use strict;
+use warnings;
 use Carp;
 
 use Scalar::Util qw(weaken);
 
 use XML::Stream;
+
 use Net::XMPP::Debug;
 use Net::XMPP::Protocol;
 
@@ -108,7 +111,8 @@ sub init
 
     $self->{STREAM} =
         XML::Stream->new(style      => "node",
-                        debugfh    => weaken $self->{DEBUG}->GetHandle(),
+                        debugfh    => $self->{DEBUG}->GetHandle(),
+                        #debugfh    => weaken $self->{DEBUG}->GetHandle(),
                         debuglevel => $self->{DEBUG}->GetLevel(),
                         debugtime  => $self->{DEBUG}->GetTime(),
                        );
@@ -117,7 +121,7 @@ sub init
 
     $self->InitCallbacks();
 
-    weaken $self->{STREAM};
+#    weaken $self->{STREAM};
     weaken $self->{CB} if $self->{CB};
 
     return $self;
@@ -179,7 +183,9 @@ sub Connect
     {
         $self->{DEBUG}->Log1("Connect: connection made");
 
-        $self->{STREAM}->SetCallBacks(node=>sub{ $self->CallBack(@_) });
+        my $weak = $self;
+        weaken $weak;
+        $self->{STREAM}->SetCallBacks(node=>sub{ $weak->CallBack(@_) });
         $self->{CONNECTED} = 1;
         $self->{RECONNECTING} = 0;
 

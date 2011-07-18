@@ -27,9 +27,6 @@ t/get_time_stamp.test
 t/iq.t
 t/jid.t
 t/lib/Net/XMPP/Test/Utils.pm
-t/lib/Test/Builder.pm
-t/lib/Test/More.pm
-t/lib/Test/Simple.pm
 t/memory_cycle.t
 t/message.t
 t/mytestlib.pl

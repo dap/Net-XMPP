@@ -56,7 +56,10 @@ under the LGPL 2.1.
 
 =cut
 
+require 5.003;
 use strict;
+use warnings;
+
 use Carp;
 use XML::Stream;
 
