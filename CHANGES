@@ -1,4 +1,14 @@
-  - Remove old copy of Test::More (szabgab)
+1.02_04 2011-07-19
+===
+  - Remove outdated Test::More/Test::Builder (szabgab)
+  - Address more memory leaks in Net::XMPP::Connection, Net::XMPP::Protocol and Net::XMPP::Roster (szabgab)
+  - Fix crash connecting to Google Talk (szabgab)
+  - Add Google Talk-specific test (szabgab)
+  - Add memory leak tests (szabgab)
+  - Correct behavior of Net::XMPP::Debug when level >= 0 (szabgab)
+  - Correct documentation with regard to debug settings (szabgab)
+  - Correct required version of Perl (szabgab)
+  - Removed specific XML::Stream version require (szabgab)
 
 1.02_03 2011-06-23
 ===

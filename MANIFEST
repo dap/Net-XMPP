@@ -23,11 +23,14 @@ README
 t/1_load.t
 t/2_client_jabberd1.4.t
 t/3_client_jabberd2.t
+t/config/accounts.yml.copyme
 t/get_time_stamp.test
+t/gtalk.t
 t/iq.t
 t/jid.t
 t/lib/Net/XMPP/Test/Utils.pm
 t/memory_cycle.t
+t/memory_leak.t
 t/message.t
 t/mytestlib.pl
 t/node1.xml
