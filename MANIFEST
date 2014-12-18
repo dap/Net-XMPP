@@ -42,3 +42,4 @@ t/query_xxxxx.test
 t/rawxml.t
 t/roster.t
 t/srv.t
+META.json

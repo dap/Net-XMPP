@@ -274,7 +274,7 @@ use Time::Local;
 use POSIX;
 use vars qw( $AUTOLOAD $VERSION $PARSING );
 
-$VERSION = "1.02_04";
+$VERSION = "1.02_05";
 
 use XML::Stream;
 use Net::XMPP::Debug;

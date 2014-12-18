@@ -1,3 +1,8 @@
+1.02_05 2014-12-17
+====
+  - Correct incorrectly tagged 1.02_04 (errantly tagged as 1.23_04)
+  - Remove extraneous tag 1.02_1 (1.02_01 points to the same content)
+
 1.02_04 2011-07-19
 ===
   - Remove outdated Test::More/Test::Builder (szabgab)
