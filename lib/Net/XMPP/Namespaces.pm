@@ -118,7 +118,7 @@ those have children under them (jabber:iq:roster).
 
 In jabber:iq:roster, the <item/> tag can be repeated multiple times,
 and is sort of like a mini-namespace in itself.  To that end, we treat
-it like a seperate namespace and defined a __netxmpp__:iq:roster:item
+it like a separate namespace and defined a __netxmpp__:iq:roster:item
 namespace to hold it.  What happens is this, in my code I define that
 the <item/>s tag is "item" and anything with that tag name is to create
 a new Net::XMPP::Stanza object with the namespace

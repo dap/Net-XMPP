@@ -68,7 +68,7 @@ The Net::XMPP module does not define any methods that you will call
 directly in your code.  Instead you will instantiate objects that call
 functions from this module to do work.  The three main objects that
 you will work with are the Message, Presence, and IQ modules. Each one
-corresponds to the Jabber equivilant and allows you get and set all
+corresponds to the Jabber equivalent and allows you get and set all
 parts of those packets.
 
 There are a few functions that are the same across all of the objects:

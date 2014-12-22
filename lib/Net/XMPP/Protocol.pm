@@ -310,7 +310,7 @@ available tags to look for are
 <message/>, <presence/>, and
 <iq/>.  If a packet is received
 with an ID which is found in the
-registerd ID list (see RegisterID
+registered ID list (see RegisterID
 below) then it is not sent to
 these functions, instead it
 is inserted into a LIST and can
