@@ -39,7 +39,7 @@
    "provides" : {
       "Net::XMPP" : {
          "file" : "lib/Net/XMPP.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Net::XMPP::Client" : {
          "file" : "lib/Net/XMPP/Client.pm"
@@ -90,5 +90,5 @@
          "url" : "https://github.com/dap/Net-XMPP"
       }
    },
-   "version" : "1.04"
+   "version" : "1.05"
 }

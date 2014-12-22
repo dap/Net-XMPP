@@ -1,3 +1,7 @@
+1.05 2014-12-22
+====
+  - Update CHANGES file
+
 1.04 2014-12-22
 ====
   - Increase XML::Stream dependency to 1.24
