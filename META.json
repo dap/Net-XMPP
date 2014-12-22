@@ -31,7 +31,7 @@
             "Authen::SASL" : "2.12",
             "Digest::SHA" : "0",
             "Scalar::Util" : "0",
-            "XML::Stream" : "1.23_07",
+            "XML::Stream" : "1.24",
             "perl" : "v5.8.0"
          }
       }
@@ -39,7 +39,7 @@
    "provides" : {
       "Net::XMPP" : {
          "file" : "lib/Net/XMPP.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Net::XMPP::Client" : {
          "file" : "lib/Net/XMPP/Client.pm"
@@ -90,5 +90,5 @@
          "url" : "https://github.com/dap/Net-XMPP"
       }
    },
-   "version" : "1.03"
+   "version" : "1.04"
 }
