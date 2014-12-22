@@ -29,7 +29,7 @@
       "runtime" : {
          "requires" : {
             "Authen::SASL" : "2.12",
-            "Digest::SHA1" : "1.02",
+            "Digest::SHA" : "0",
             "Scalar::Util" : "0",
             "XML::Stream" : "1.23_07",
             "perl" : "v5.8.0"
@@ -39,7 +39,7 @@
    "provides" : {
       "Net::XMPP" : {
          "file" : "lib/Net/XMPP.pm",
-         "version" : "1.02_05"
+         "version" : "1.03"
       },
       "Net::XMPP::Client" : {
          "file" : "lib/Net/XMPP/Client.pm"
@@ -78,17 +78,17 @@
          "file" : "lib/Net/XMPP/Stanza.pm"
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Dist/Display.html?Queue=Net-XMPP"
+         "web" : "https://github.com/dap/Net-XMPP/issues"
       },
       "license" : [
          "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ],
       "repository" : {
-         "url" : "http://github.com/dap/Net-XMPP"
+         "url" : "https://github.com/dap/Net-XMPP"
       }
    },
-   "version" : "1.02_05"
+   "version" : "1.03"
 }

@@ -18,7 +18,7 @@ name: Net-XMPP
 provides:
   Net::XMPP:
     file: lib/Net/XMPP.pm
-    version: 1.02_05
+    version: '1.03'
   Net::XMPP::Client:
     file: lib/Net/XMPP/Client.pm
   Net::XMPP::Connection:
@@ -45,12 +45,12 @@ provides:
     file: lib/Net/XMPP/Stanza.pm
 requires:
   Authen::SASL: '2.12'
-  Digest::SHA1: '1.02'
+  Digest::SHA: '0'
   Scalar::Util: '0'
   XML::Stream: 1.23_07
   perl: v5.8.0
 resources:
-  bugtracker: https://rt.cpan.org/Dist/Display.html?Queue=Net-XMPP
+  bugtracker: https://github.com/dap/Net-XMPP/issues
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
-  repository: http://github.com/dap/Net-XMPP
-version: 1.02_05
+  repository: https://github.com/dap/Net-XMPP
+version: '1.03'

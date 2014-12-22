@@ -1,3 +1,10 @@
+1.03 2014-12-22
+====
+  - Roll-up of all 1.02_* changes
+  - Update bug tracker location
+  - RT#94649 use Digest::SHA (from Debian package maintainers)
+  - RT#94650 spelling corrections (from Debian package maintainers)
+
 1.02_05 2014-12-17
 ====
   - Correct incorrectly tagged 1.02_04 (errantly tagged as 1.23_04)
