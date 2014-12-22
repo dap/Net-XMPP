@@ -22,7 +22,7 @@ my $build = Module::Build->new(
 	requires => {
 		'perl'         => 'v5.8.0',
 		'Authen::SASL' => '2.12',
-		'Digest::SHA1' => '1.02',
+		'Digest::SHA'  => '0',
 		'XML::Stream'  => '1.23_07',
 		'Scalar::Util' => '0',
 	},
