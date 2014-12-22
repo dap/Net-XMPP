@@ -1366,7 +1366,7 @@ sub _parse_tree
     {
         foreach my $xTree (@xTrees)
         {
-            if( exists($Net::XMPP::Namespaces::NS{$xTrees[0]->get_attrib("xmlns")}))
+            if( exists($Net::XMPP::Namespaces::NS{$xTree->get_attrib("xmlns")}))
             {
                 $self->AddChild($xTree);
                 $self->{TREE}->remove_child($xTree);
