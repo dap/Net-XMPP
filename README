@@ -12,5 +12,5 @@ access to the XMPP protocol.  Using OOP modules we provide a clean
 interface to writing anything from a full client to a simple protocol
 tester.
 
-Please report bugs at https://rt.cpan.org/Public/Bug/Report.html?Queue=Net-XMPP.
+Please report bugs at https://github.com/dap/Net-XMPP/issues.
 

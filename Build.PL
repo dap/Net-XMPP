@@ -32,8 +32,8 @@ my $build = Module::Build->new(
 	create_makefile_pl => 'small',
 	meta_merge => {
 		'resources' => {
-			'bugtracker' => 'https://rt.cpan.org/Dist/Display.html?Queue=Net-XMPP',
-			'repository' => 'http://github.com/dap/Net-XMPP',
+			'bugtracker' => 'https://github.com/dap/Net-XMPP/issues',
+			'repository' => 'https://github.com/dap/Net-XMPP',
 		}
 	},
 );
