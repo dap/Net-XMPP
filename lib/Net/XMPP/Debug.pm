@@ -183,7 +183,17 @@ sub Init
     my $self = shift;
 
     my %args;
-    while($#_ >= 0) { $args{ lc pop(@_) } = pop(@_); }
+    while($#_ >= 0) 
+      {
+	if($#_ == 0)
+	  {
+	    pop(@_);
+	  }
+	else
+	  {
+	    $args{ lc pop(@_) } = pop(@_);
+	  }
+      }
 
     delete($args{file}) if (defined $args{file} && lc($args{file}) eq "stdout");
 
