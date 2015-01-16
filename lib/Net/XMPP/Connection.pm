@@ -195,11 +195,17 @@ sub Connect
             my $tls = $self->GetStreamFeature("xmpp-tls");
             if (defined($tls) && $self->{SERVER}->{tls})
             {
+		my $oldSid = $self->{SESSION}->{id};
                 $self->{SESSION} =
                     $self->{STREAM}->StartTLS(
                         $self->{SESSION}->{id},
                         $self->{SERVER}->{timeout},
                     );
+		if (!$self->{SESSION}) {
+		    $self->{DEBUG}->Log1("Connect: no TLS session");
+		    $self->SetErrorCode("TLS negotiatiation failed: ".$self->{STREAM}->TLSClientError($oldSid));
+		    return;
+		}
             }
             elsif (defined($tls) && ($tls eq "required"))
             {
