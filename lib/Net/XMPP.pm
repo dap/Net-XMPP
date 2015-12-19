@@ -54,7 +54,7 @@ callback finishes.  This means you cannot be operating on a packet,
 send out another packet and wait for a response to that packet.  It
 will never get to you.  Threading might solve this, but as of this
 writing threading in Perl is not quite up to par yet.  This issue will
-be revisted in the future.
+be revisited in the future.
 
 
 =head1 EXAMPLES
@@ -121,7 +121,7 @@ the specified namespace and root tag of
 whatever the namespace says its root tag
 should be.  Optionally you may specify
 another root tag if the default is not
-desired, or the namespace requres you to set
+desired, or the namespace requires you to set
 one.
 
   $xObj = $obj->NewChild("my:namespace");

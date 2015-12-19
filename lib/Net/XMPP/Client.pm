@@ -194,7 +194,7 @@ connection attempt.
 
 If you specify register=>1, then the
 Client will attempt to register the
-sepecified account for you, if it
+specified account for you, if it
 does not exist.
 
 =head2 Process
