@@ -694,7 +694,7 @@ will be placed in the <presence/>.
 
  Subscription(hash)
 
-taks the hash and passes it to SetPresence in
+takes the hash and passes it to SetPresence in
 Net::XMPP::Presence (refer there for valid
 settings).  Then it sends the subscription to
 server.
@@ -1025,7 +1025,7 @@ above.
 
 returns the entry from the above hash for
 the given key.  The available keys are:
-  name, ask, subsrcription and groups
+  name, ask, subscription and groups
 The JID is either a string, or a
 L<Net::XMPP::JID> object.
 

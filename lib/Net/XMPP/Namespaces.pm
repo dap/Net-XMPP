@@ -35,7 +35,7 @@ storage bin for all of the Namespace information Net::XMPP requires.
 
 XMPP as a protocol is very well defined.  There are three main top
 level packets (message, iq, and presence).  There is also a way to
-extend the protocol in a very clear and strucutred way, via namespaces.
+extend the protocol in a very clear and structured way, via namespaces.
 
 Two major ways that namespaces are used in Jabber is for making the
 <iq/> a generic wrapper, and as a way for adding data to any packet via

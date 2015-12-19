@@ -35,7 +35,7 @@ query, update, and manage a user's roster.
 
 The Roster object seeks to provide an easy to use API for interfacing
 with a user's roster.  When you instantiate it, it automatically
-registers with the connection to receivce the correct packets so
+registers with the connection to receive the correct packets so
 that it can track all roster updates, and presence packets.
 
 =head2 Basic Functions
