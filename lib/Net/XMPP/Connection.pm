@@ -105,6 +105,12 @@ sub init
     $self->{SERVER}->{tls} = $self->_arg("tls",0);
     $self->{SERVER}->{ssl} = $self->_arg("ssl",0);
     $self->{SERVER}->{connectiontype} = $self->_arg("connectiontype","tcpip");
+    if (exists $self->{ARGS}->{servername}) {
+        $self->{SERVER}->{servername} = $self->{ARGS}->{servername};
+    }
+    if (exists $self->{ARGS}->{srv}) {
+        $self->{SERVER}->{srv} = $self->{ARGS}->{srv};
+    }
 
     $self->{CONNECTED} = 0;
     $self->{DISCONNECTED} = 0;
@@ -175,6 +181,14 @@ sub Connect
                     ),
                     ( defined $self->{SERVER}->{srv}
                         ? (srv => '_xmpp-client._tcp')
+                        : ()
+                    ),
+                    (exists($self->{SERVER}->{servername})
+                        ? (servername => $self->{SERVER}->{servername} )
+                        : ()
+                    ),
+                    (exists($self->{SERVER}->{srv})
+                        ? (srv => $self->{SERVER}->{srv} )
                         : ()
                     ),
                    );
