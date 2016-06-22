@@ -89,6 +89,7 @@ sub new
 sub init
 {
     my $self = shift;
+    weaken $self;
 
     $self->{CONNECTION}-> SetXPathCallBacks('/iq[@type="result" or @type="set"]/query[@xmlns="jabber:iq:privacy"]'=>sub{ $self->handler(@_) });
 }
