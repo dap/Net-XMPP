@@ -1851,6 +1851,7 @@ sub MessageSend
 sub PresenceDB
 {
     my $self = shift;
+    weaken $self;
 
     $self->SetXPathCallBacks('/presence'=>sub{ shift; $self->PresenceDBParse(@_) });
 }
@@ -2710,6 +2711,7 @@ sub Roster
 sub RosterDB
 {
     my $self = shift;
+    weaken $self;
 
     $self->SetXPathCallBacks('/iq[@type="result" or @type="set"]/query[@xmlns="jabber:iq:roster"]'=>sub{ shift; $self->RosterDBParse(@_) });
 }
@@ -2993,6 +2995,7 @@ sub RosterDBRemove
 sub TLSInit
 {
     my $self = shift;
+    weaken $self;
 
     $TLS_CALLBACK = sub{ $self->ProcessTLSStanza( @_ ) };
     $self->SetDirectXPathCallBacks('/[@xmlns="'.&ConstXMLNS("xmpp-tls").'"]'=>$TLS_CALLBACK);
@@ -3181,6 +3184,7 @@ sub TLSSendStartTLS
 sub SASLInit
 {
     my $self = shift;
+    weaken $self;
 
     $SASL_CALLBACK = sub{ $self->ProcessSASLStanza( @_ ) };
     $self->SetDirectXPathCallBacks('/[@xmlns="'.&ConstXMLNS("xmpp-sasl").'"]'=> $SASL_CALLBACK);

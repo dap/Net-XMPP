@@ -52,7 +52,7 @@ BEGIN {
 }
 
 my $repeat = 5;
-plan tests => 2 + 6 * $repeat;
+plan tests => 9 + 6 * $repeat;
 
 # TODO ask user if it is ok to do network tests!
 print_size('before loading Net::XMPP');
@@ -90,17 +90,14 @@ for (2..$repeat) {
 }
 
 # The leakage shown here happens even before Authentication is called
-#SKIP: {
-#    skip 'Devel::LeakGuard::Object is needed', 1 if not $leak_guard;
-#    my $warn;
-#    local $SIG{__WARN__} = sub { $warn = shift };
-#    leakguard {
-#         run();
-#    };
-#
-#    ok(!$warn, 'leaking') or diag $warn;
-#}
+skip 'Devel::LeakGuard::Object is needed', 1 if not $leak_guard;
+my $warn;
+local $SIG{__WARN__} = sub { $warn = shift };
+leakguard {
+        run();
+};
 
+ok(!$warn, 'leaking') or diag $warn;
 
 # as I can see setting up the connection leaks in the first 5 attempts 
 # and then it stops leaking. I tried it with repeate=25

@@ -22,8 +22,6 @@ check_leak(
     'nothing',
 );
 
-TODO: {
-   local $TODO = 'fix leak';
 check_leak(
     sub {
         my $conn   = Net::XMPP::Client->new;
@@ -46,7 +44,6 @@ check_leak(
     },
     'connect',
 );
-}
 
 
 sub check_leak{
