@@ -90,12 +90,14 @@ for (2..$repeat) {
 }
 
 # The leakage shown here happens even before Authentication is called
-skip 'Devel::LeakGuard::Object is needed', 1 if not $leak_guard;
 my $warn;
-local $SIG{__WARN__} = sub { $warn = shift };
-leakguard {
-        run();
-};
+SKIP: {
+    skip 'Devel::LeakGuard::Object is needed', 6 if not $leak_guard;
+    local $SIG{__WARN__} = sub { $warn = shift };
+    leakguard {
+            run();
+    };
+}
 
 ok(!$warn, 'leaking') or diag $warn;
 
