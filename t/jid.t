@@ -3,7 +3,7 @@ use Test::More tests=>15;
 
 BEGIN{ use_ok( "Net::XMPP" ); }
 
-require "t/mytestlib.pl";
+require "./t/mytestlib.pl";
 
 my $jid = Net::XMPP::JID->new('host.com/xxx@yyy.com/zzz');
 ok( defined($jid), "new()" );

@@ -3,7 +3,7 @@ use Test::More tests=>54;
 
 BEGIN{ use_ok( "Net::XMPP" ); }
 
-require "t/mytestlib.pl";
+require "./t/mytestlib.pl";
 
 my $message = Net::XMPP::Message->new();
 ok( defined($message), "new()");
