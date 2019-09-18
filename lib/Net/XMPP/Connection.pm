@@ -58,7 +58,7 @@ use Carp;
 
 use Scalar::Util qw(weaken);
 
-use XML::Stream;
+use Net::XMPP::XML::Stream;
 
 use Net::XMPP::Debug;
 use Net::XMPP::Protocol;
@@ -110,7 +110,7 @@ sub init
     $self->{DISCONNECTED} = 0;
 
     $self->{STREAM} =
-        XML::Stream->new(style      => "node",
+        Net::XMPP::XML::Stream->new(style      => "node",
                         debugfh    => $self->{DEBUG}->GetHandle(),
                         #debugfh    => weaken $self->{DEBUG}->GetHandle(),
                         debuglevel => $self->{DEBUG}->GetLevel(),
