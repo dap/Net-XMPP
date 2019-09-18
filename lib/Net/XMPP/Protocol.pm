@@ -2253,7 +2253,9 @@ sub AuthSASL
     my $status =
         $self->{STREAM}->SASLClient($sid,
                                     $args{username},
-                                    $args{password}
+                                    $args{password},
+                                    $args{resource},
+                                    $args{sasl_mechanisms}
                                    );
 
     $args{timeout} = "120" unless exists($args{timeout});
