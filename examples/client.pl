@@ -36,9 +36,19 @@ if (!(defined($status)))
     exit(0);
 }
 
-my @result = $Connection->AuthSend(username=>$username,
-                                   password=>$password,
-                                   resource=>$resource);
+my @result = $Connection->AuthSend(
+    username=>$username,
+    password=>$password,
+    resource=>$resource,
+    # can be omitted in most cases. See Net::XMPP::XML::Stream for details.
+    sasl_opts => {
+        'sasl_mechanisms' => [
+            'ANONYMOUS', 'CRAM-MD5', 'DIGEST-MD5', 'EXTERNAL', 'GSSAPI',
+            'LOGIN', 'PLAIN'
+        ],
+        'use_authzid' => 0
+    }
+);
 
 if ($result[0] ne "ok")
 {
